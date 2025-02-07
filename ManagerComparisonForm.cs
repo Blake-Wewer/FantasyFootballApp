@@ -125,6 +125,10 @@ namespace FantasyFootballApp
 
             using (AppDbContext context = new AppDbContext())
             {
+                // Set Dynamic Labels
+                labelYearSpecifiedRangeMatchupRecord.Text = "Last " + numericUpDownYearSpecifier.Value + " Season" + ((int)numericUpDownYearSpecifier.Value > 1 ? "s" : "");
+                labelYearSpecifiedRangeFavoredMatchupRecord.Text = "Last " + numericUpDownYearSpecifier.Value + " Season" + ((int)numericUpDownYearSpecifier.Value > 1 ? "s" : "") + " (When Favored)";
+
                 // Gather normalized league data
                 var normalized_league_data = context.LeagueSeasons
                                                 .Where(ls => ls.LeagueId == selectedLeague
@@ -361,7 +365,7 @@ namespace FantasyFootballApp
                         {
                             favored_favored_wins++;
                         }
-                        if (matchup_season <= current_league_season.Season.Name - numericUpDownYearSpecifier.Value)
+                        if (matchup_season > current_league_season.Season.Name - numericUpDownYearSpecifier.Value)
                         {
                             year_specified_favored_wins++;
                             if (favored.TeamProjPoints > opp.TeamProjPoints)
@@ -369,7 +373,7 @@ namespace FantasyFootballApp
                                 year_specified_favored_favored_wins++;
                             }
                         }
-                        if (matchup_season <= current_league_season.Season.Name - 1)
+                        if (matchup_season > current_league_season.Season.Name - 2)
                         {
                             last_season_favored_wins++;
                             if (favored.TeamProjPoints > opp.TeamProjPoints)
@@ -401,7 +405,7 @@ namespace FantasyFootballApp
                         {
                             favored_favored_losses++;
                         }
-                        if (matchup_season <= current_league_season.Season.Name - numericUpDownYearSpecifier.Value)
+                        if (matchup_season > current_league_season.Season.Name - numericUpDownYearSpecifier.Value)
                         {
                             year_specified_favored_losses++;
                             if (favored.TeamProjPoints > opp.TeamProjPoints)
@@ -409,7 +413,7 @@ namespace FantasyFootballApp
                                 year_specified_favored_favored_losses++;
                             }
                         }
-                        if (matchup_season <= current_league_season.Season.Name - 1)
+                        if (matchup_season > current_league_season.Season.Name - 2)
                         {
                             last_season_favored_losses++;
                             if (favored.TeamProjPoints > opp.TeamProjPoints)
@@ -437,7 +441,7 @@ namespace FantasyFootballApp
                         {
                             favored_favored_ties++;
                         }
-                        if (matchup_season <= current_league_season.Season.Name - numericUpDownYearSpecifier.Value)
+                        if (matchup_season > current_league_season.Season.Name - numericUpDownYearSpecifier.Value)
                         {
                             year_specified_favored_ties++;
                             if (favored.TeamProjPoints > opp.TeamProjPoints)
@@ -445,7 +449,7 @@ namespace FantasyFootballApp
                                 year_specified_favored_favored_ties++;
                             }
                         }
-                        if (matchup_season <= current_league_season.Season.Name - 1)
+                        if (matchup_season > current_league_season.Season.Name - 2)
                         {
                             last_season_favored_ties++;
                             if (favored.TeamProjPoints > opp.TeamProjPoints)
