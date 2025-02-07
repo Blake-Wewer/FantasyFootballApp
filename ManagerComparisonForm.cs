@@ -203,8 +203,9 @@ namespace FantasyFootballApp
                 String opponent_manager_power_ranking = "-";
                 try
                 {
-                    favored_manager_power_ranking  = Math.Round(power_rankings[selectedFavoredManager], 3) + " (#" + (power_rankings.Keys.Cast<object>().ToList().IndexOf(selectedFavoredManager) + 1) + ")";
-                } catch (KeyNotFoundException exception)
+                    favored_manager_power_ranking = Math.Round(power_rankings[selectedFavoredManager], 3) + " (#" + (power_rankings.Keys.Cast<object>().ToList().IndexOf(selectedFavoredManager) + 1) + ")";
+                }
+                catch (KeyNotFoundException exception)
                 {
                 }
                 try
@@ -246,7 +247,8 @@ namespace FantasyFootballApp
                         favored_manager_all_time_regular_season_record = favored_manager_ties == 0
                                                         ? favored_manager_wins + "-" + favored_manager_losses + " (" + Math.Round((double)favored_manager_wins / (double)(favored_manager_wins + favored_manager_losses), 5) + ")"
                                                         : favored_manager_wins + "-" + favored_manager_losses + "-" + favored_manager_ties + " (" + Math.Round(((double)favored_manager_wins + (0.5 * (double)favored_manager_ties)) / (double)(favored_manager_wins + favored_manager_losses + favored_manager_ties), 5) + ")";
-                    } else
+                    }
+                    else
                     {
                         favored_manager_all_time_regular_season_record = "0-0 (-)";
                     }
@@ -289,7 +291,8 @@ namespace FantasyFootballApp
                         opponent_manager_all_time_regular_season_record = opponent_manager_ties == 0
                                                         ? opponent_manager_wins + "-" + opponent_manager_losses + " (" + Math.Round((double)opponent_manager_wins / (double)(opponent_manager_wins + opponent_manager_losses), 5) + ")"
                                                         : opponent_manager_wins + "-" + opponent_manager_losses + "-" + opponent_manager_ties + " (" + Math.Round(((double)opponent_manager_wins + (0.5 * (double)opponent_manager_ties)) / (double)(opponent_manager_wins + opponent_manager_losses + opponent_manager_ties), 5) + ")";
-                    } else
+                    }
+                    else
                     {
                         opponent_manager_all_time_regular_season_record = "0-0 (-)";
                     }
@@ -458,13 +461,13 @@ namespace FantasyFootballApp
 
                 // Fill in Matchup Breakdown Values
                 // CHECK FOR selected_matchups.Count == 0
-                if(selected_matchups.Count != 0)
+                if (selected_matchups.Count != 0)
                 {
                     textBoxFavoredManagerAverageScore.Text = (favored_manager_total_points / (double)selected_matchups.Count).ToString("F3");
                     textBoxOpponentManagerAverageScore.Text = (opponent_manager_total_points / (double)selected_matchups.Count).ToString("F3");
 
-                    textBoxFavoredManagerGreatestMOV.Text = favored_manager_greatest_mov != null 
-                                                                ? favored_manager_greatest_mov.ToString() + " (" + favored_manager_greatest_mov_matchup.LeagueSeason.Season.Name + ", W" + favored_manager_greatest_mov_matchup.Week + ")" 
+                    textBoxFavoredManagerGreatestMOV.Text = favored_manager_greatest_mov != null
+                                                                ? favored_manager_greatest_mov.ToString() + " (" + favored_manager_greatest_mov_matchup.LeagueSeason.Season.Name + ", W" + favored_manager_greatest_mov_matchup.Week + ")"
                                                                 : "-";
                     textBoxOpponentManagerGreatestMOV.Text = opponent_manager_greatest_mov != null
                                                                 ? opponent_manager_greatest_mov.ToString() + " (" + opponent_manager_greatest_mov_matchup.LeagueSeason.Season.Name + ", W" + opponent_manager_greatest_mov_matchup.Week + ")"
@@ -475,7 +478,8 @@ namespace FantasyFootballApp
 
                     textBoxFavoredManagerPowerRankingScore.Text = favored_manager_power_ranking;
                     textBoxOpponentManagerPowerRankingScore.Text = opponent_manager_power_ranking;
-                } else
+                }
+                else
                 {
                     textBoxFavoredManagerAverageScore.Text = "-";
                     textBoxOpponentManagerAverageScore.Text = "-";
@@ -499,13 +503,13 @@ namespace FantasyFootballApp
                 if (selected_matchups.Count != 0)
                 {
                     // Can skip the zero check on this one or else we would have not passed the if statement above
-                    textBoxAllTimeMatchupRecord.Text = favored_ties == 0 
-                                                        ? favored_wins + "-" + favored_losses + " (" + ((double)favored_wins / (double)selected_matchups.Count()).ToString("F5") + ")" 
-                                                        : favored_wins + "-" + favored_losses + "-" + favored_ties + " (" + (((double)favored_wins + ((double)favored_ties * 0.5))/ (double)selected_matchups.Count()).ToString("F5") + ")";
-                    textBoxAllTimeFavoredMatchupRecord.Text = favored_favored_wins + favored_favored_losses + favored_favored_ties > 0 
+                    textBoxAllTimeMatchupRecord.Text = favored_ties == 0
+                                                        ? favored_wins + "-" + favored_losses + " (" + ((double)favored_wins / (double)selected_matchups.Count()).ToString("F5") + ")"
+                                                        : favored_wins + "-" + favored_losses + "-" + favored_ties + " (" + (((double)favored_wins + ((double)favored_ties * 0.5)) / (double)selected_matchups.Count()).ToString("F5") + ")";
+                    textBoxAllTimeFavoredMatchupRecord.Text = favored_favored_wins + favored_favored_losses + favored_favored_ties > 0
                                                         ? (favored_favored_ties == 0
                                                                 ? favored_favored_wins + "-" + favored_favored_losses + " (" + ((double)favored_favored_wins / (double)(favored_favored_wins + favored_favored_losses)).ToString("F5") + ")"
-                                                                : favored_favored_wins + "-" + favored_favored_losses + "-" + favored_favored_ties + " (" + (((double)favored_favored_wins + ((double)favored_favored_ties * 0.5)) / (double)(favored_favored_wins + favored_favored_losses + favored_favored_ties)).ToString("F5") + ")") 
+                                                                : favored_favored_wins + "-" + favored_favored_losses + "-" + favored_favored_ties + " (" + (((double)favored_favored_wins + ((double)favored_favored_ties * 0.5)) / (double)(favored_favored_wins + favored_favored_losses + favored_favored_ties)).ToString("F5") + ")")
                                                         : "0-0 (-)";
 
                     textBoxYearSpecifiedRangeMatchupRecord.Text = year_specified_favored_wins + year_specified_favored_losses + year_specified_favored_ties > 0
@@ -529,7 +533,8 @@ namespace FantasyFootballApp
                                                                 ? last_season_favored_favored_wins + "-" + last_season_favored_favored_losses + " (" + ((double)last_season_favored_favored_wins / (double)(last_season_favored_favored_wins + last_season_favored_favored_losses)).ToString("F5") + ")"
                                                                 : last_season_favored_favored_wins + "-" + last_season_favored_favored_losses + "-" + last_season_favored_favored_ties + " (" + (((double)last_season_favored_favored_wins + ((double)last_season_favored_favored_ties * 0.5)) / (double)(last_season_favored_favored_wins + last_season_favored_favored_losses + last_season_favored_favored_ties)).ToString("F5") + ")")
                                                         : "0-0 (-)";
-                } else
+                }
+                else
                 {
                     textBoxAllTimeMatchupRecord.Text = "0-0 (-)";
                     textBoxAllTimeFavoredMatchupRecord.Text = "0-0 (-)";

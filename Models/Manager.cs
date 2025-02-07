@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FantasyFootballApp.Models
 {
     [Table("managers")]
-    public class Manager {
+    public class Manager
+    {
         [Key]
         [Column("manager_id")]
         public required int Id { get; set; }
@@ -20,7 +20,7 @@ namespace FantasyFootballApp.Models
         public string? Nickname { get; set; }
 
         [Column("email")]
-        public required string Email{ get; set; }
+        public required string Email { get; set; }
 
         [Column("spreadsheet_eligible")]
         public required int SpreadsheetEligible { get; set; }

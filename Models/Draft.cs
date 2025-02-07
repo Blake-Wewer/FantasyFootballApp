@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FantasyFootballApp.Models
 {
-    public enum EnumDraftType {
+    public enum EnumDraftType
+    {
         Standard,
         SalaryCap,
         Auction

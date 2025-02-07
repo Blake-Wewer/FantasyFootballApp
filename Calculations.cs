@@ -1,10 +1,5 @@
 ﻿using FantasyFootballApp.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FantasyFootballApp
 {
@@ -26,7 +21,8 @@ namespace FantasyFootballApp
                 {
                     current_league_season_query = current_league_season_query.Include(ls => ls.Season)
                                 .Where(ls => ls.LeagueId == selectedLeague && ls.Season.Name == year);
-                } else
+                }
+                else
                 {
                     current_league_season_query = current_league_season_query.Include(ls => ls.Season)
                                 .Where(ls => ls.LeagueId == selectedLeague)
@@ -40,7 +36,7 @@ namespace FantasyFootballApp
                                                 && mat.PlayoffMatchup == 0)
                                         .Select(mat => mat.Id)
                                         .ToList();
-                if(context.Matchups.Where(mat => all_league_season_matchup_ids.Contains(mat.Id) && mat.MatchupDetails.Count > 1).Count() == 0)
+                if (context.Matchups.Where(mat => all_league_season_matchup_ids.Contains(mat.Id) && mat.MatchupDetails.Count > 1).Count() == 0)
                 {
                     return new Dictionary<int, double>();
                 }
@@ -147,7 +143,7 @@ namespace FantasyFootballApp
                 int all_play_wins = 0;
                 int all_play_losses = 0;
                 int all_play_ties = 0;
-                foreach(MatchupDetail md in matchup_details)
+                foreach (MatchupDetail md in matchup_details)
                 {
                     foreach (MatchupDetail opp_md in opp_matchup_details.Where(omd => omd.Matchup.Week == md.Matchup.Week).ToList())
                     {
@@ -229,16 +225,19 @@ namespace FantasyFootballApp
                         {
                             m1_wins++;
                             m2_losses++;
-                        } else if (m1_md.TeamPoints < m1_opp_md.TeamPoints)
+                        }
+                        else if (m1_md.TeamPoints < m1_opp_md.TeamPoints)
                         {
                             m1_losses++;
                             m2_wins++;
-                        } else if (m1_md.TeamPoints == m1_opp_md.TeamPoints)
+                        }
+                        else if (m1_md.TeamPoints == m1_opp_md.TeamPoints)
                         {
                             m1_ties++;
                             m2_ties++;
                         }
-                    } else
+                    }
+                    else
                     {
                         MatchupDetail m2_md = m2_matchup_details.Where(opp_md => opp_md.Matchup.Week == m1_md.Matchup.Week).First();
                         MatchupDetail m2_opp_md = m2_md.Matchup.MatchupDetails.Where(opp_md => opp_md.Id != m2_md.Id).First();

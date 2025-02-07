@@ -1,9 +1,8 @@
 ﻿namespace FantasyFootballApp
 {
-    using System.Configuration;
     using FantasyFootballApp.Models;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+    using System.Configuration;
 
     /// <summary>
     /// Defines the <see cref="AppDbContext" />

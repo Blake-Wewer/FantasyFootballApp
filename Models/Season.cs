@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FantasyFootballApp.Models
 {
     [Table("seasons")]
-    public class Season {
+    public class Season
+    {
         [Key]
         [Column("season_id")]
         public required int Id { get; set; }

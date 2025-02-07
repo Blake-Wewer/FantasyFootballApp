@@ -1,7 +1,5 @@
 using FantasyFootballApp.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Update;
-using MySqlX.XDevAPI;
 using System.Data;
 
 namespace FantasyFootballApp
@@ -12,7 +10,7 @@ namespace FantasyFootballApp
         public HomeForm()
         {
             InitializeComponent();
-            
+
             // Attach KeyPress event handler
             textBoxSeason.KeyPress += TextBoxSeason_KeyPress;
         }
@@ -127,7 +125,8 @@ namespace FantasyFootballApp
             if (selectedLeague == -1)
             {
                 ErrorMessages.LeagueRequiredMessageBox();
-            } else
+            }
+            else
             {
                 using (AppDbContext context = new AppDbContext())
                 {
@@ -136,7 +135,8 @@ namespace FantasyFootballApp
                     if (textBoxSeason.Text.Length > 0 && int.TryParse(textBoxSeason.Text.ToString(), out season))
                     {
                         power_rankings = Calculations.CalculateLeaguePowerRankings(selectedLeague, season);
-                    } else
+                    }
+                    else
                     {
                         power_rankings = Calculations.CalculateLeaguePowerRankings(selectedLeague);
                     }
