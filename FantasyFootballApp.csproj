@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Configurations>Debug;Release;Test</Configurations>
+    <Platforms>AnyCPU;x64</Platforms>
+    <BaseOutputPath>C:\Users\bewew\Desktop\FantasyFootballApp Builds</BaseOutputPath>
+    <PackageOutputPath>C:\Users\bewew\Desktop\FantasyFootballApp Builds</PackageOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

@@ -34,7 +34,7 @@ namespace FantasyFootballApp.Models
         public string? RivalryWeeks { get; set; }
 
         [Column("nut_cup_week")]
-        public required int NutCupWeek { get; set; }
+        public int? NutCupWeek { get; set; }
 
         [Column("avg_points")]
         public required double AvgPoints { get; set; }

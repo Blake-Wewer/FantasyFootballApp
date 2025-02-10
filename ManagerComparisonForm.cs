@@ -148,18 +148,6 @@ namespace FantasyFootballApp
                                             .Select(md => md.Id)
                                             .Distinct()
                                             .ToList();
-                string query = context.MatchupDetails
-                                                .Where(md => favored_matchup_detail_ids.Contains(md.Id))
-                                                .Include(md => md.Matchup)
-                                                    .ThenInclude(m => m.MatchupDetails)
-                                                    .ThenInclude(md => md.Team)
-                                                    .ThenInclude(t => t.Manager)
-                                                .Include(md => md.Matchup)
-                                                    .ThenInclude(mat => mat.LeagueSeason)
-                                                    .ThenInclude(ls => ls.Season)
-                                                .Include(md => md.Team)
-                                                    .ThenInclude(t => t.TeamDetail)
-                                                .ToQueryString();
                 List<MatchupDetail> favored_manager_matchups = context.MatchupDetails
                                                 .Where(md => favored_matchup_detail_ids.Contains(md.Id))
                                                 .Include(md => md.Matchup)
