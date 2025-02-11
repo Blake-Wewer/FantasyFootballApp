@@ -540,15 +540,15 @@ namespace FantasyFootballApp
                 // Fill in Manager V Manager Comparison Values
                 textBoxFavoredManagerAllTimeRegularSeasonRecord.Text = favored_manager_all_time_regular_season_record;
                 textBoxFavoredManagerChampionships.Text = favored_manager_championships.ToString();
-                textBoxFavoredManagerAvgDivisionFinish.Text = favored_manager_avg_division_finish == "-" ? favored_manager_avg_division_finish : Math.Round(double.Parse(favored_manager_avg_division_finish), 3).ToString();
-                textBoxFavoredManagerAvgPlayoffSeed.Text = favored_manager_avg_playoff_seed == "-" ? favored_manager_avg_playoff_seed : (favored_manager_avg_playoff_seed == "-1" ? "-" : Math.Round(double.Parse(favored_manager_avg_playoff_seed), 3).ToString());
-                textBoxFavoredManagerAvgFinish.Text = favored_manager_avg_finish == "-" ? favored_manager_avg_finish : Math.Round(double.Parse(favored_manager_avg_finish), 3).ToString();
+                textBoxFavoredManagerAvgDivisionFinish.Text = favored_manager_avg_division_finish == "-" ? favored_manager_avg_division_finish : Math.Round(double.Parse(favored_manager_avg_division_finish), 3).ToString("F3");
+                textBoxFavoredManagerAvgPlayoffSeed.Text = favored_manager_avg_playoff_seed == "-" ? favored_manager_avg_playoff_seed : (favored_manager_avg_playoff_seed == "-1" ? "-" : Math.Round(double.Parse(favored_manager_avg_playoff_seed), 3).ToString("F3"));
+                textBoxFavoredManagerAvgFinish.Text = favored_manager_avg_finish == "-" ? favored_manager_avg_finish : Math.Round(double.Parse(favored_manager_avg_finish), 3).ToString("F3");
 
                 textBoxOpponentManagerAllTimeRegularSeasonRecord.Text = opponent_manager_all_time_regular_season_record;
                 textBoxOpponentManagerChampionships.Text = opponent_manager_championships.ToString();
-                textBoxOpponentManagerAvgDivisionFinish.Text = opponent_manager_avg_division_finish == "-" ? opponent_manager_avg_division_finish : Math.Round(double.Parse(opponent_manager_avg_division_finish), 3).ToString();
-                textBoxOpponentManagerAvgPlayoffSeed.Text = opponent_manager_avg_playoff_seed == "-" ? opponent_manager_avg_playoff_seed : (opponent_manager_avg_playoff_seed == "-1" ? "-" : Math.Round(double.Parse(opponent_manager_avg_playoff_seed), 3).ToString());
-                textBoxOpponentManagerAvgFinish.Text = opponent_manager_avg_finish == "-" ? opponent_manager_avg_finish : Math.Round(double.Parse(opponent_manager_avg_finish), 3).ToString();
+                textBoxOpponentManagerAvgDivisionFinish.Text = opponent_manager_avg_division_finish == "-" ? opponent_manager_avg_division_finish : Math.Round(double.Parse(opponent_manager_avg_division_finish), 3).ToString("F3");
+                textBoxOpponentManagerAvgPlayoffSeed.Text = opponent_manager_avg_playoff_seed == "-" ? opponent_manager_avg_playoff_seed : (opponent_manager_avg_playoff_seed == "-1" ? "-" : Math.Round(double.Parse(opponent_manager_avg_playoff_seed), 3).ToString("F3"));
+                textBoxOpponentManagerAvgFinish.Text = opponent_manager_avg_finish == "-" ? opponent_manager_avg_finish : Math.Round(double.Parse(opponent_manager_avg_finish), 3).ToString("F3");
 
                 tableLayoutPanelManagerVsManagerComparisonResults.Visible = true;
             }
