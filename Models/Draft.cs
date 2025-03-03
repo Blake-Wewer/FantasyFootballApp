@@ -22,7 +22,8 @@ namespace FantasyFootballApp.Models
         public required int LeagueSeasonId { get; set; }
 
         [Column("draft_type")]
-        public EnumDraftType? DraftType { get; set; }
+        [EnumDataType(typeof(string))]
+        public string? DraftType { get; set; }
 
         [Column("num_rounds")]
         public int? NumRounds { get; set; }

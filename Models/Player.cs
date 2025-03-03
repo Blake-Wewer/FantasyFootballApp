@@ -26,7 +26,7 @@ namespace FantasyFootballApp.Models
         public required string Team { get; set; }
 
         [Column("position")]
-        public required EnumPosition Position { get; set; }
+        public string? Position { get; set; }
 
         [Column("image")]
         public required string Image { get; set; }

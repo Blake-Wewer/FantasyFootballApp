@@ -30,43 +30,52 @@ namespace FantasyFootballApp
         private void InitializeComponent()
         {
             btnManagers = new Button();
-            dataGridView1 = new DataGridView();
-            label_League = new Label();
+            dataGridViewHomeForm = new DataGridView();
+            labelLeague = new Label();
             comboBoxLeague = new ComboBox();
             btnManagerVsManager = new Button();
             btnPowerRankings = new Button();
             textBoxSeason = new TextBox();
             labelYear = new Label();
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
+            buttonDraftResults = new Button();
+            buttonAllPlay = new Button();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewHomeForm).BeginInit();
             SuspendLayout();
             // 
             // btnManagers
             // 
-            btnManagers.Location = new Point(12, 12);
+            btnManagers.Enabled = false;
+            btnManagers.Location = new Point(250, 11);
             btnManagers.Name = "btnManagers";
             btnManagers.Size = new Size(75, 23);
             btnManagers.TabIndex = 0;
             btnManagers.Text = "Managers";
             btnManagers.UseVisualStyleBackColor = true;
+            btnManagers.Visible = false;
             btnManagers.Click += btnManagers_Click;
             // 
-            // dataGridView1
+            // dataGridViewHomeForm
             // 
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
-            dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(12, 41);
-            dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(776, 397);
-            dataGridView1.TabIndex = 1;
+            dataGridViewHomeForm.AllowUserToAddRows = false;
+            dataGridViewHomeForm.AllowUserToDeleteRows = false;
+            dataGridViewHomeForm.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            dataGridViewHomeForm.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+            dataGridViewHomeForm.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewHomeForm.Location = new Point(12, 41);
+            dataGridViewHomeForm.MinimumSize = new Size(700, 350);
+            dataGridViewHomeForm.Name = "dataGridViewHomeForm";
+            dataGridViewHomeForm.Size = new Size(776, 397);
+            dataGridViewHomeForm.TabIndex = 1;
             // 
-            // label_League
+            // labelLeague
             // 
-            label_League.AutoSize = true;
-            label_League.Location = new Point(469, 16);
-            label_League.Name = "label_League";
-            label_League.Size = new Size(48, 15);
-            label_League.TabIndex = 2;
-            label_League.Text = "League:";
+            labelLeague.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            labelLeague.AutoSize = true;
+            labelLeague.Location = new Point(469, 16);
+            labelLeague.Name = "labelLeague";
+            labelLeague.Size = new Size(48, 15);
+            labelLeague.TabIndex = 2;
+            labelLeague.Text = "League:";
             // 
             // comboBoxLeague
             // 
@@ -83,7 +92,7 @@ namespace FantasyFootballApp
             // 
             // btnManagerVsManager
             // 
-            btnManagerVsManager.Location = new Point(198, 12);
+            btnManagerVsManager.Location = new Point(206, 11);
             btnManagerVsManager.Name = "btnManagerVsManager";
             btnManagerVsManager.Size = new Size(127, 23);
             btnManagerVsManager.TabIndex = 4;
@@ -93,7 +102,7 @@ namespace FantasyFootballApp
             // 
             // btnPowerRankings
             // 
-            btnPowerRankings.Location = new Point(93, 12);
+            btnPowerRankings.Location = new Point(12, 11);
             btnPowerRankings.Name = "btnPowerRankings";
             btnPowerRankings.Size = new Size(99, 23);
             btnPowerRankings.TabIndex = 5;
@@ -103,6 +112,7 @@ namespace FantasyFootballApp
             // 
             // textBoxSeason
             // 
+            textBoxSeason.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             textBoxSeason.Location = new Point(747, 12);
             textBoxSeason.MaxLength = 4;
             textBoxSeason.Name = "textBoxSeason";
@@ -112,6 +122,7 @@ namespace FantasyFootballApp
             // 
             // labelYear
             // 
+            labelYear.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelYear.AutoSize = true;
             labelYear.Location = new Point(694, 16);
             labelYear.Name = "labelYear";
@@ -119,23 +130,46 @@ namespace FantasyFootballApp
             labelYear.TabIndex = 7;
             labelYear.Text = "Season:";
             // 
+            // buttonDraftResults
+            // 
+            buttonDraftResults.Location = new Point(117, 11);
+            buttonDraftResults.Name = "buttonDraftResults";
+            buttonDraftResults.Size = new Size(83, 23);
+            buttonDraftResults.TabIndex = 8;
+            buttonDraftResults.Text = "Draft Results";
+            buttonDraftResults.UseVisualStyleBackColor = true;
+            buttonDraftResults.Click += buttonDraftResults_Click;
+            // 
+            // buttonAllPlay
+            // 
+            buttonAllPlay.Location = new Point(339, 11);
+            buttonAllPlay.Name = "buttonAllPlay";
+            buttonAllPlay.Size = new Size(58, 23);
+            buttonAllPlay.TabIndex = 9;
+            buttonAllPlay.Text = "All-Play";
+            buttonAllPlay.UseVisualStyleBackColor = true;
+            buttonAllPlay.Click += buttonAllPlay_Click;
+            // 
             // HomeForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(buttonAllPlay);
+            Controls.Add(buttonDraftResults);
             Controls.Add(labelYear);
             Controls.Add(textBoxSeason);
             Controls.Add(btnPowerRankings);
             Controls.Add(btnManagerVsManager);
             Controls.Add(comboBoxLeague);
-            Controls.Add(label_League);
-            Controls.Add(dataGridView1);
+            Controls.Add(labelLeague);
+            Controls.Add(dataGridViewHomeForm);
             Controls.Add(btnManagers);
+            MinimumSize = new Size(750, 0);
             Name = "HomeForm";
             Text = "Fantasy Football App";
             Load += HomeForm_Load;
-            ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dataGridViewHomeForm).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -143,12 +177,14 @@ namespace FantasyFootballApp
         #endregion
 
         private Button btnManagers;
-        private DataGridView dataGridView1;
-        private Label label_League;
+        private DataGridView dataGridViewHomeForm;
+        private Label labelLeague;
         private ComboBox comboBoxLeague;
         private Button btnManagerVsManager;
         private Button btnPowerRankings;
         private TextBox textBoxSeason;
         private Label labelYear;
+        private Button buttonDraftResults;
+        private Button buttonAllPlay;
     }
 }

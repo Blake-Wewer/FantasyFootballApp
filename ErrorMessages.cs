@@ -21,5 +21,10 @@
         {
             MessageBox.Show("The selected managers must be unique to run this query.\nPlease select two unique managers from the dropdown box.", "ERROR!");
         }
+
+        public static void ReportCouldNotBeRanMessageBox()
+        {
+            MessageBox.Show("Report could not be ran.", "ERROR!");
+        }
     }
 }

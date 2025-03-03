@@ -18,7 +18,8 @@ namespace FantasyFootballApp.Models
         public required int PlayerId { get; set; }
 
         [Column("roster_position")]
-        public required EnumRosterPosition RosterPosition { get; set; }
+        [EnumDataType(typeof(string))]
+        public required string RosterPosition { get; set; }
 
 
         // Relationships

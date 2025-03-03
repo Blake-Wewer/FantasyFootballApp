@@ -17,7 +17,8 @@ namespace FantasyFootballApp.Models
         public required DateTime Timestamp { get; set; }
 
         [Column("transaction_type")]
-        public required EnumTransactionType TransactionType { get; set; }
+        [EnumDataType(typeof(string))]
+        public required string TransactionType { get; set; }
 
         [ForeignKey("Team")]
         [Column("team1_id")]

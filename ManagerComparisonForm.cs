@@ -1,6 +1,7 @@
 ﻿using FantasyFootballApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Windows.Forms;
 using static FantasyFootballApp.HomeForm;
 
 namespace FantasyFootballApp
@@ -63,6 +64,8 @@ namespace FantasyFootballApp
                 comboBoxOpponent.DataSource = formattedManagers.ToArray();
                 comboBoxOpponent.DisplayMember = "Display";
                 comboBoxOpponent.ValueMember = "ID";
+
+                buttonDisplayAllMatchups.Enabled = false;
             }
         }
 
@@ -86,6 +89,8 @@ namespace FantasyFootballApp
                     comboBoxOpponent.DataSource = new ComboBoxItem[] { new ComboBoxItem { ID = -1, Display = " - Select a League First - " } };
                     comboBoxOpponent.DisplayMember = "Display";
                     comboBoxOpponent.ValueMember = "ID";
+
+                    buttonDisplayAllMatchups.Enabled = false;
                 }
             }
         }
@@ -550,7 +555,10 @@ namespace FantasyFootballApp
                 textBoxOpponentManagerAvgPlayoffSeed.Text = opponent_manager_avg_playoff_seed == "-" ? opponent_manager_avg_playoff_seed : (opponent_manager_avg_playoff_seed == "-1" ? "-" : Math.Round(double.Parse(opponent_manager_avg_playoff_seed), 3).ToString("F3"));
                 textBoxOpponentManagerAvgFinish.Text = opponent_manager_avg_finish == "-" ? opponent_manager_avg_finish : Math.Round(double.Parse(opponent_manager_avg_finish), 3).ToString("F3");
 
+                tableLayoutPanelManagerVsManagerComparisonResults.Enabled = true;
                 tableLayoutPanelManagerVsManagerComparisonResults.Visible = true;
+                dataGridViewAllManagerVsManagerMatchups.Enabled = false;
+                dataGridViewAllManagerVsManagerMatchups.Visible = false;
             }
         }
 
@@ -560,6 +568,21 @@ namespace FantasyFootballApp
             if (comboBoxFavoredManager.SelectedValue != null)
             {
                 selectedFavoredManager = (int)comboBoxFavoredManager.SelectedValue;
+                if (selectedFavoredManager != -1 && selectedOpponentManager != -1 && selectedFavoredManager != selectedOpponentManager)
+                {
+                    buttonDisplayAllMatchups.Enabled = true;
+                    buttonRunManagerVsManager.Enabled = true;
+                }
+                else
+                {
+                    buttonDisplayAllMatchups.Enabled = false;
+                    buttonRunManagerVsManager.Enabled = false;
+                }
+            }
+            else
+            {
+                buttonDisplayAllMatchups.Enabled = false;
+                buttonRunManagerVsManager.Enabled = false;
             }
         }
 
@@ -569,8 +592,127 @@ namespace FantasyFootballApp
             if (comboBoxOpponent.SelectedValue != null)
             {
                 selectedOpponentManager = (int)comboBoxOpponent.SelectedValue;
+                if (selectedFavoredManager != -1 && selectedOpponentManager != -1 && selectedFavoredManager != selectedOpponentManager)
+                {
+                    buttonDisplayAllMatchups.Enabled = true;
+                    buttonRunManagerVsManager.Enabled = true;
+                }
+                else
+                {
+                    buttonDisplayAllMatchups.Enabled = false;
+                    buttonRunManagerVsManager.Enabled = false;
+                }
+            }
+            else
+            {
+                buttonDisplayAllMatchups.Enabled = false;
+                buttonRunManagerVsManager.Enabled = false;
             }
         }
 
+        private void buttonDisplayAllMatchups_Click(object sender, EventArgs e)
+        {
+            using (AppDbContext context = new AppDbContext())
+            {
+                // Gather all favored manager matchups
+                List<int> favored_matchup_detail_ids = context.MatchupDetails
+                                        .Where(md => md.Team.Manager.Id == selectedFavoredManager
+                                                && md.Matchup.LeagueSeason.LeagueId == selectedLeague)
+                                        .Select(md => md.Id)
+                                        .Distinct()
+                                        .ToList();
+                List<int> opp_matchup_ids = context.MatchupDetails
+                                        .Where(md => md.Team.Manager.Id == selectedOpponentManager
+                                                && md.Matchup.LeagueSeason.LeagueId == selectedLeague)
+                                        .Select(md => md.MatchupId)
+                                        .Distinct()
+                                        .ToList();
+                List<MatchupDetail> managers_matchups = context.MatchupDetails
+                                                .Where(md => favored_matchup_detail_ids.Contains(md.Id) && opp_matchup_ids.Contains(md.MatchupId))
+                                                .Include(md => md.Matchup)
+                                                    .ThenInclude(m => m.MatchupDetails)
+                                                    .ThenInclude(md => md.Team)
+                                                    .ThenInclude(t => t.Manager)
+                                                .Include(md => md.Matchup)
+                                                    .ThenInclude(m => m.LeagueSeason)
+                                                    .ThenInclude(ls => ls.Season)
+                                                .Include(md => md.Team)
+                                                    .ThenInclude(t => t.TeamDetail)
+                                                .ToList();
+                Manager m1 = context.Managers.Find(selectedFavoredManager);
+                Manager m2 = context.Managers.Find(selectedOpponentManager);
+
+                DataTable results = new DataTable();
+                results.Columns.Add("Season", typeof(int));
+                results.Columns.Add("Week", typeof(double));
+                results.Columns.Add("Division", typeof(String));
+                results.Columns.Add("Rivalry Week", typeof(String));
+                results.Columns.Add("Nut Cup", typeof(String));
+                results.Columns.Add("Playoff", typeof(String));
+                results.Columns.Add("Champ Playoff", typeof(String));
+                results.Columns.Add("Medal Playoff", typeof(String));
+                results.Columns.Add("Winner", typeof(String));
+                results.Columns.Add("Covered", typeof(int));
+                results.Columns.Add("Upset", typeof(int));
+                results.Columns.Add("Over", typeof(int));
+                results.Columns.Add("MoV", typeof(string));
+                results.Columns.Add("Spread", typeof(string));
+                results.Columns.Add((m1.Nickname ?? m1.FirstName) + " Proj Points", typeof(String));
+                results.Columns.Add((m1.Nickname ?? m1.FirstName) + " Points", typeof(String));
+                results.Columns.Add((m2.Nickname ?? m2.FirstName) + " Points", typeof(String));
+                results.Columns.Add((m2.Nickname ?? m2.FirstName) + " Proj Points", typeof(String));
+
+                foreach(MatchupDetail md in managers_matchups)
+                {
+                    MatchupDetail opp_md = md.Matchup.MatchupDetails.Where(omd => omd.Id != md.Id).First();
+                    string is_division_matchup = md.Team.DivisionId != null && opp_md.Team.DivisionId != null && md.Team.DivisionId == opp_md.Team.DivisionId ? "DIVISION" : "";
+                    string is_rivalry_week_matchup = "";
+                    if (md.Team.LeagueSeason.RivalryWeeks != null && md.Team.LeagueSeason.RivalryWeeks.Split(',').Contains(md.Matchup.Week.ToString())) is_rivalry_week_matchup = "RIVALRY WEEK";
+                    string winner = md.TeamPoints == opp_md.TeamPoints ? "-- TIE --"
+                                                    : md.TeamPoints > opp_md.TeamPoints ? m1.Nickname ?? m1.FirstName : m2.Nickname ?? m2.FirstName;
+                    int covered = 0;
+                    int upset = 0;
+                    int over = md.TeamPoints + opp_md.TeamPoints >= md.TeamProjPoints + opp_md.TeamProjPoints ? 1 : 0;
+                    if (md.TeamProjPoints > opp_md.TeamProjPoints)
+                    {
+                        if (md.TeamPoints - opp_md.TeamPoints > md.TeamProjPoints - opp_md.TeamProjPoints) covered = 1;
+                        if (md.TeamPoints < opp_md.TeamPoints) upset = 1;
+                    }
+                    else if (md.TeamProjPoints < opp_md.TeamProjPoints)
+                    {
+                        if (opp_md.TeamPoints - md.TeamPoints > opp_md.TeamProjPoints - md.TeamProjPoints) covered = 1;
+                        if (opp_md.TeamPoints < md.TeamPoints) upset = 1;
+                    }
+                    results.Rows.Add(md.Matchup.LeagueSeason.Season.Name,
+                                 md.Matchup.Week,
+                                 is_division_matchup,
+                                 is_rivalry_week_matchup,
+                                 md.Matchup.LeagueSeason.NutCupWeek != null && md.Matchup.LeagueSeason.NutCupWeek == md.Matchup.Week ? "NUT CUP" : "",
+                                 md.Matchup.PlayoffMatchup == 1 ? "PLAYOFF" : "",
+                                 md.Matchup.ChampionshipPlayoffMatchup == 1 ? "CHAMPIONSHIP PLAYOFF" : "",
+                                 md.Matchup.MedalPlayoffMatchup == 1 ? "MEDAL PLAYOFF" : "",
+                                 winner,
+                                 covered,
+                                 upset,
+                                 over,
+                                 Math.Round(md.TeamPoints - opp_md.TeamPoints, 2).ToString("F2"),
+                                 Math.Round((double)(md.TeamProjPoints - opp_md.TeamProjPoints), 2).ToString("F2") ?? "-",
+                                 md.TeamProjPoints?.ToString("F2") ?? "-",
+                                 md.TeamPoints.ToString("F2"),
+                                 opp_md.TeamPoints.ToString("F2"),
+                                 opp_md.TeamProjPoints?.ToString("F2") ?? "-"
+                                 );
+                }
+                // Display or manipulate the data here
+                dataGridViewAllManagerVsManagerMatchups.DataSource = results;
+                dataGridViewAllManagerVsManagerMatchups.Sort(dataGridViewAllManagerVsManagerMatchups.Columns[1], System.ComponentModel.ListSortDirection.Ascending);
+                dataGridViewAllManagerVsManagerMatchups.Sort(dataGridViewAllManagerVsManagerMatchups.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
+            }
+
+            tableLayoutPanelManagerVsManagerComparisonResults.Enabled = false;
+            tableLayoutPanelManagerVsManagerComparisonResults.Visible = false;
+            dataGridViewAllManagerVsManagerMatchups.Enabled = true;
+            dataGridViewAllManagerVsManagerMatchups.Visible = true;
+        }
     }
 }
