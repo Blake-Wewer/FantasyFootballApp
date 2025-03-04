@@ -483,8 +483,6 @@ namespace FantasyFootballApp
                 results.Columns.Add("All-Play Win %", typeof(string));
                 if (has_h2h_games)
                 {
-                    //results.Columns.Add("All-Play Record", typeof(string));
-                    //results.Columns.Add("All-Play Win %", typeof(string));
                     results.Columns.Add("Actual Record", typeof(string));
                     results.Columns.Add("Actual Win %", typeof(string));
                     results.Columns.Add("All-Play vs Actual Win %", typeof(string));
