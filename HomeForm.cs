@@ -183,7 +183,7 @@ namespace FantasyFootballApp
                     results.Columns.Add("ADP vs Pick Diff", typeof(double));
                     results.Columns.Add("% Max ADP Gained", typeof(string));
                     results.Columns.Add("Overall Rank Finish", typeof(int));
-                    //results.Columns.Add("Position Rank Finish", typeof(int));
+                    results.Columns.Add("Position Rank Finish", typeof(int));
 
                     var draft_results = draft_results_query.ToList();
                     foreach (DraftPick pick in draft_results)
@@ -201,7 +201,8 @@ namespace FantasyFootballApp
                                          pick.Pick != pick.Round
                                                         ? (((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) / (double)(pick.Pick - pick.Round)) * 100).ToString("F2") + "%"
                                                         : ((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) * 100).ToString("F2") + "%",
-                                         pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().OverallRanking
+                                         pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().OverallRanking,
+                                         pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().PositionRanking
                             );
                         }
                         else
@@ -218,7 +219,8 @@ namespace FantasyFootballApp
                                          pick.Pick != pick.Round
                                                         ? (((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) / (double)(pick.Pick - pick.Round)) * 100).ToString("F2") + "%"
                                                         : ((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) * 100).ToString("F2") + "%",
-                                         pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().OverallRanking
+                                         pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().OverallRanking,
+                                         pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().PositionRanking
                             );
                         }
                     }

@@ -24,6 +24,9 @@ namespace FantasyFootballApp.Models
         [Column("overall_ranking")]
         public required int OverallRanking { get; set; }
 
+        [Column("position_ranking")]
+        public required int PositionRanking { get; set; }
+
         [Column("team")]
         public required string Team { get; set; }
 
@@ -32,8 +35,6 @@ namespace FantasyFootballApp.Models
 
         [Column("status_details")]
         public required string StatusDetails { get; set; }
-
-        //public required List<KeyValuePair<string, int>> SeasonStats { get; set; }
 
         [Column("image")]
         public required string Image { get; set; }
