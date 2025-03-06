@@ -44,6 +44,7 @@
             buttonAllPlayReport = new Button();
             dataGridViewAllPlay = new DataGridView();
             checkBoxIncludeByeWeeks = new CheckBox();
+            buttonHelp = new Button();
             groupBoxAdditionalAllPlayParameters.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridViewAllPlay).BeginInit();
             SuspendLayout();
@@ -80,7 +81,7 @@
             groupBoxAdditionalAllPlayParameters.Controls.Add(textBoxWeekEnd);
             groupBoxAdditionalAllPlayParameters.Controls.Add(labelWeekStart);
             groupBoxAdditionalAllPlayParameters.Controls.Add(textBoxWeekStart);
-            groupBoxAdditionalAllPlayParameters.Location = new Point(424, 12);
+            groupBoxAdditionalAllPlayParameters.Location = new Point(430, 12);
             groupBoxAdditionalAllPlayParameters.Name = "groupBoxAdditionalAllPlayParameters";
             groupBoxAdditionalAllPlayParameters.Size = new Size(492, 50);
             groupBoxAdditionalAllPlayParameters.TabIndex = 9;
@@ -210,7 +211,8 @@
             dataGridViewAllPlay.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewAllPlay.Location = new Point(12, 68);
             dataGridViewAllPlay.Name = "dataGridViewAllPlay";
-            dataGridViewAllPlay.Size = new Size(904, 474);
+            dataGridViewAllPlay.ReadOnly = true;
+            dataGridViewAllPlay.Size = new Size(910, 481);
             dataGridViewAllPlay.TabIndex = 15;
             // 
             // checkBoxIncludeByeWeeks
@@ -223,11 +225,25 @@
             checkBoxIncludeByeWeeks.Text = "Include Bye Weeks";
             checkBoxIncludeByeWeeks.UseVisualStyleBackColor = true;
             // 
+            // buttonHelp
+            // 
+            buttonHelp.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            buttonHelp.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            buttonHelp.Location = new Point(903, 10);
+            buttonHelp.Margin = new Padding(0);
+            buttonHelp.Name = "buttonHelp";
+            buttonHelp.Size = new Size(22, 22);
+            buttonHelp.TabIndex = 17;
+            buttonHelp.Text = "?";
+            buttonHelp.UseVisualStyleBackColor = true;
+            buttonHelp.Click += buttonHelp_Click;
+            // 
             // AllPlayForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(928, 554);
+            ClientSize = new Size(934, 561);
+            Controls.Add(buttonHelp);
             Controls.Add(checkBoxIncludeByeWeeks);
             Controls.Add(dataGridViewAllPlay);
             Controls.Add(buttonAllPlayReport);
@@ -236,6 +252,7 @@
             Controls.Add(comboBoxLeague);
             Controls.Add(labelLeague);
             Controls.Add(groupBoxAdditionalAllPlayParameters);
+            MinimumSize = new Size(940, 500);
             Name = "AllPlayForm";
             Text = "All-Play Form";
             Load += AllPlayForm_Load;
@@ -264,5 +281,6 @@
         private Label label1;
         private TextBox textBoxSeasonEnd;
         private CheckBox checkBoxIncludeByeWeeks;
+        private Button buttonHelp;
     }
 }

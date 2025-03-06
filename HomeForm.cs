@@ -1,12 +1,15 @@
 using FantasyFootballApp.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Data;
+using System.Reflection;
 
 namespace FantasyFootballApp
 {
     public partial class HomeForm : Form
     {
         public int selectedLeague = -1;
+        public string lastReportRan = string.Empty;
         public HomeForm()
         {
             InitializeComponent();
@@ -22,9 +25,27 @@ namespace FantasyFootballApp
         private void TextBoxSeason_KeyPress(object sender, KeyPressEventArgs e)
         {
             // Allow numbers, Backspace, and Delete
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) {
                 e.Handled = true; // Block the input
+            } else if (e.KeyChar == (char)Keys.Enter) {
+                if (lastReportRan != string.Empty) {
+                    switch (lastReportRan) {
+                        case "btnManagers_Click":
+                            this.btnManagers_Click(sender, e);
+                            break;
+                        case "buttonStandings_Click":
+                            this.buttonStandings_Click(sender, e);
+                            break;
+                        case "btnPowerRankings_Click":
+                            this.btnPowerRankings_Click(sender, e);
+                            break;
+                        case "buttonDraftResults_Click":
+                            this.buttonDraftResults_Click(sender, e);
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
         }
 
@@ -86,6 +107,8 @@ namespace FantasyFootballApp
         private void btnManagers_Click(object sender, EventArgs e)
         {
             ManagerTableQuery();
+
+            lastReportRan = "btnManagers_Click";
         }
 
         private void btnManagerVsManager_Click(object sender, EventArgs e)
@@ -106,6 +129,75 @@ namespace FantasyFootballApp
                 Score = s;
                 ManagerName = n;
             }
+        }
+
+        private void buttonStandings_Click(object sender, EventArgs e)
+        {
+            if (selectedLeague == -1)
+            {
+                ErrorMessages.LeagueRequiredMessageBox();
+            }
+            else
+            {
+                using (AppDbContext context = new AppDbContext())
+                {
+                    var standings_query = context.Teams
+                                            .Include(t => t.TeamDetail)
+                                            .Include(t => t.Manager)
+                                            .Include(t => t.LeagueSeason)
+                                                .ThenInclude(ls => ls.Season)
+                                            .Where(t => t.LeagueSeason.LeagueId == selectedLeague)
+                                            .OrderBy(t => t.TeamDetail.Finish)
+                                                .ThenBy(t => t.LeagueSeason.Season.Name)
+                                            .AsQueryable();
+                    int season = -1;
+                    if (textBoxSeason.Text.Length > 0 && int.TryParse(textBoxSeason.Text.ToString(), out season))
+                    {
+                        standings_query = standings_query.Where(t => t.LeagueSeason.Season.Name == season);
+                    }
+
+                    List<Team> standings = standings_query.ToList();
+                    List<int> seasons = standings.Select(t => t.LeagueSeason.Season.Name).Distinct().ToList();
+                    int max_finish = standings.Select(t => t.TeamDetail.Finish).Max();
+
+                    DataTable results = new DataTable();
+                    dataGridViewHomeForm.Columns.Clear();
+
+                    results.Columns.Add("Finish", typeof(int));
+                    foreach (int s in seasons)
+                    {
+                        results.Columns.Add(s.ToString(), typeof(string));
+                    }
+                    for (int i = 1; i <= max_finish; i++)
+                    {
+                        List<object> row = new List<object>() { i };
+                        foreach (int s in seasons)
+                        {
+                            Team team = standings.Where(t => t.TeamDetail.Finish == i && t.LeagueSeason.Season.Name == s).FirstOrDefault();
+                            if (team != null)
+                            {
+                                string record = team.TeamDetail.Wins != null
+                                                ? "(" + (team.TeamDetail.Ties == 0
+                                                    ? team.TeamDetail.Wins + "-" + team.TeamDetail.Losses
+                                                    : team.TeamDetail.Wins + "-" + team.TeamDetail.Losses + "-" + team.TeamDetail.Ties) + ")"
+                                                : "";
+                                row.Add(team.Manager.FirstName + " " + team.Manager.LastName + "   " + record);
+                            }
+                            else
+                            {
+                                row.Add("");
+                            }
+                        }
+                        results.Rows.Add(row.ToArray());
+                    }
+
+                    // Display or manipulate the data here
+                    dataGridViewHomeForm.DataSource = results;
+                    dataGridViewHomeForm.Sort(dataGridViewHomeForm.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
+                }
+            }
+
+            lastReportRan = "buttonStandings_Click";
         }
 
         private void btnPowerRankings_Click(object sender, EventArgs e)
@@ -143,6 +235,8 @@ namespace FantasyFootballApp
                     dataGridViewHomeForm.Sort(dataGridViewHomeForm.Columns[0], System.ComponentModel.ListSortDirection.Ascending);
                 }
             }
+
+            lastReportRan = "btnPowerRankings_Click";
         }
 
         private void buttonDraftResults_Click(object sender, EventArgs e)
@@ -181,7 +275,7 @@ namespace FantasyFootballApp
                     results.Columns.Add("ADR", typeof(string));
                     results.Columns.Add("ADP", typeof(string));
                     results.Columns.Add("ADP vs Pick Diff", typeof(double));
-                    results.Columns.Add("% Max ADP Gained", typeof(string));
+                    results.Columns.Add("% Max ADP Gained", typeof(double));
                     results.Columns.Add("Overall Rank Finish", typeof(int));
                     results.Columns.Add("Position Rank Finish", typeof(int));
 
@@ -195,12 +289,12 @@ namespace FantasyFootballApp
                                          pick.Team.Manager.FirstName + " " + pick.Team.Manager.LastName,
                                          pick.Player.FirstName + " " + pick.Player.LastName,
                                          pick.Player.Position ?? "-",
-                                         pick.AvgRound != null ? Math.Round((double)pick.AvgRound, 2).ToString("F2") : "-",
+                                         pick.AvgRound != null ? Math.Round((double)pick.AvgRound, 2).ToString("F1") : "-",
                                          pick.AvgPick != null ? Math.Round((double)pick.AvgPick, 2).ToString("F2") : "-",
                                          pick.AvgRound != null && pick.AvgPick != null ? Math.Round((double)pick.AvgPick - (double)pick.Pick, 2).ToString("F2") : Math.Round((double)(pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1) - (double)pick.Pick, 2).ToString("F2"),
                                          pick.Pick != pick.Round
-                                                        ? (((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) / (double)(pick.Pick - pick.Round)) * 100).ToString("F2") + "%"
-                                                        : ((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) * 100).ToString("F2") + "%",
+                                                        ? Math.Round((((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) / (double)(pick.Pick - pick.Round)) * 100), 2)
+                                                        : Math.Round(((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) * 100), 2),
                                          pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().OverallRanking,
                                          pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().PositionRanking
                             );
@@ -213,12 +307,12 @@ namespace FantasyFootballApp
                                          pick.Team.Manager.FirstName + " " + pick.Team.Manager.LastName,
                                          pick.Player.FirstName + " " + pick.Player.LastName,
                                          pick.Player.Position ?? "-",
-                                         pick.AvgRound != null ? Math.Round((double)pick.AvgRound, 2).ToString("F2") : "-",
+                                         pick.AvgRound != null ? Math.Round((double)pick.AvgRound, 2).ToString("F1") : "-",
                                          pick.AvgPick != null ? Math.Round((double)pick.AvgPick, 2).ToString("F2") : "-",
                                          pick.AvgRound != null && pick.AvgPick != null ? Math.Round((double)pick.AvgPick - (double)pick.Pick, 2).ToString("F2") : Math.Round((double)(pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1) - (double)pick.Pick, 2).ToString("F2"),
                                          pick.Pick != pick.Round
-                                                        ? (((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) / (double)(pick.Pick - pick.Round)) * 100).ToString("F2") + "%"
-                                                        : ((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) * 100).ToString("F2") + "%",
+                                                        ? Math.Round((((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) / (double)(pick.Pick - pick.Round)) * 100), 2)
+                                                        : Math.Round(((double)(pick.Pick - (pick.AvgPick ?? pick.Draft.NumRounds * pick.Draft.LeagueSeason.NumTeams + 1)) * 100), 2),
                                          pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().OverallRanking,
                                          pick.Player.Seasons.Where(ps => ps.SeasonId == pick.Draft.LeagueSeason.SeasonId).First().PositionRanking
                             );
@@ -227,6 +321,8 @@ namespace FantasyFootballApp
 
                     // Display or manipulate the data here
                     dataGridViewHomeForm.DataSource = results;
+                    dataGridViewHomeForm.Columns["ADP vs Pick Diff"].DefaultCellStyle.Format = "N1";
+                    dataGridViewHomeForm.Columns["% Max ADP Gained"].DefaultCellStyle.Format = "N2";
                     if (season != -1)
                     {
                         dataGridViewHomeForm.Sort(dataGridViewHomeForm.Columns[1], System.ComponentModel.ListSortDirection.Ascending);
@@ -238,6 +334,8 @@ namespace FantasyFootballApp
                     }
                 }
             }
+
+            lastReportRan = "buttonDraftResults_Click";
         }
 
         private void buttonAllPlay_Click(object sender, EventArgs e)

@@ -39,13 +39,14 @@ namespace FantasyFootballApp
             labelYear = new Label();
             buttonDraftResults = new Button();
             buttonAllPlay = new Button();
+            buttonStandings = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridViewHomeForm).BeginInit();
             SuspendLayout();
             // 
             // btnManagers
             // 
             btnManagers.Enabled = false;
-            btnManagers.Location = new Point(250, 11);
+            btnManagers.Location = new Point(413, 11);
             btnManagers.Name = "btnManagers";
             btnManagers.Size = new Size(75, 23);
             btnManagers.TabIndex = 0;
@@ -64,14 +65,15 @@ namespace FantasyFootballApp
             dataGridViewHomeForm.Location = new Point(12, 41);
             dataGridViewHomeForm.MinimumSize = new Size(700, 350);
             dataGridViewHomeForm.Name = "dataGridViewHomeForm";
-            dataGridViewHomeForm.Size = new Size(776, 397);
+            dataGridViewHomeForm.ReadOnly = true;
+            dataGridViewHomeForm.Size = new Size(860, 458);
             dataGridViewHomeForm.TabIndex = 1;
             // 
             // labelLeague
             // 
             labelLeague.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelLeague.AutoSize = true;
-            labelLeague.Location = new Point(469, 16);
+            labelLeague.Location = new Point(553, 16);
             labelLeague.Name = "labelLeague";
             labelLeague.Size = new Size(48, 15);
             labelLeague.TabIndex = 2;
@@ -83,7 +85,7 @@ namespace FantasyFootballApp
             comboBoxLeague.DisplayMember = "Display";
             comboBoxLeague.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxLeague.FormattingEnabled = true;
-            comboBoxLeague.Location = new Point(523, 12);
+            comboBoxLeague.Location = new Point(607, 12);
             comboBoxLeague.Name = "comboBoxLeague";
             comboBoxLeague.Size = new Size(165, 23);
             comboBoxLeague.TabIndex = 3;
@@ -92,7 +94,7 @@ namespace FantasyFootballApp
             // 
             // btnManagerVsManager
             // 
-            btnManagerVsManager.Location = new Point(206, 11);
+            btnManagerVsManager.Location = new Point(280, 11);
             btnManagerVsManager.Name = "btnManagerVsManager";
             btnManagerVsManager.Size = new Size(127, 23);
             btnManagerVsManager.TabIndex = 4;
@@ -102,7 +104,7 @@ namespace FantasyFootballApp
             // 
             // btnPowerRankings
             // 
-            btnPowerRankings.Location = new Point(12, 11);
+            btnPowerRankings.Location = new Point(86, 11);
             btnPowerRankings.Name = "btnPowerRankings";
             btnPowerRankings.Size = new Size(99, 23);
             btnPowerRankings.TabIndex = 5;
@@ -113,7 +115,7 @@ namespace FantasyFootballApp
             // textBoxSeason
             // 
             textBoxSeason.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBoxSeason.Location = new Point(747, 12);
+            textBoxSeason.Location = new Point(831, 12);
             textBoxSeason.MaxLength = 4;
             textBoxSeason.Name = "textBoxSeason";
             textBoxSeason.Size = new Size(41, 23);
@@ -124,7 +126,7 @@ namespace FantasyFootballApp
             // 
             labelYear.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             labelYear.AutoSize = true;
-            labelYear.Location = new Point(694, 16);
+            labelYear.Location = new Point(778, 16);
             labelYear.Name = "labelYear";
             labelYear.Size = new Size(47, 15);
             labelYear.TabIndex = 7;
@@ -132,7 +134,7 @@ namespace FantasyFootballApp
             // 
             // buttonDraftResults
             // 
-            buttonDraftResults.Location = new Point(117, 11);
+            buttonDraftResults.Location = new Point(191, 11);
             buttonDraftResults.Name = "buttonDraftResults";
             buttonDraftResults.Size = new Size(83, 23);
             buttonDraftResults.TabIndex = 8;
@@ -142,7 +144,7 @@ namespace FantasyFootballApp
             // 
             // buttonAllPlay
             // 
-            buttonAllPlay.Location = new Point(339, 11);
+            buttonAllPlay.Location = new Point(413, 11);
             buttonAllPlay.Name = "buttonAllPlay";
             buttonAllPlay.Size = new Size(58, 23);
             buttonAllPlay.TabIndex = 9;
@@ -150,11 +152,22 @@ namespace FantasyFootballApp
             buttonAllPlay.UseVisualStyleBackColor = true;
             buttonAllPlay.Click += buttonAllPlay_Click;
             // 
+            // buttonStandings
+            // 
+            buttonStandings.Location = new Point(12, 11);
+            buttonStandings.Name = "buttonStandings";
+            buttonStandings.Size = new Size(68, 23);
+            buttonStandings.TabIndex = 10;
+            buttonStandings.Text = "Standings";
+            buttonStandings.UseVisualStyleBackColor = true;
+            buttonStandings.Click += buttonStandings_Click;
+            // 
             // HomeForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(884, 511);
+            Controls.Add(buttonStandings);
             Controls.Add(buttonAllPlay);
             Controls.Add(buttonDraftResults);
             Controls.Add(labelYear);
@@ -165,7 +178,7 @@ namespace FantasyFootballApp
             Controls.Add(labelLeague);
             Controls.Add(dataGridViewHomeForm);
             Controls.Add(btnManagers);
-            MinimumSize = new Size(750, 0);
+            MinimumSize = new Size(800, 0);
             Name = "HomeForm";
             Text = "Fantasy Football App";
             Load += HomeForm_Load;
@@ -186,5 +199,6 @@ namespace FantasyFootballApp
         private Label labelYear;
         private Button buttonDraftResults;
         private Button buttonAllPlay;
+        private Button buttonStandings;
     }
 }

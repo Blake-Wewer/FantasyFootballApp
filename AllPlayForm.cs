@@ -44,7 +44,7 @@ namespace FantasyFootballApp
             using (AppDbContext context = new AppDbContext())
             {
                 List<League> leagues = context.Leagues.ToList();
-                // Display or manipulate the data here
+
                 List<ComboBoxItem> formattedLeagues = new List<ComboBoxItem>();
                 formattedLeagues.Add(new ComboBoxItem { ID = -1, Display = " - Select a League - " });
                 foreach (League league in leagues)
@@ -328,7 +328,7 @@ namespace FantasyFootballApp
                                             (((double)man.ap_wins + (0.5 * (double)man.ap_ties)) / (double)(man.ap_wins + man.ap_losses + man.ap_ties)).ToString("F5"));
                     }
                 }
-                // Display or manipulate the data here
+
                 dataGridViewAllPlay.DataSource = results;
                 dataGridViewAllPlay.Sort(dataGridViewAllPlay.Columns[2], ListSortDirection.Descending);
             }
@@ -535,7 +535,7 @@ namespace FantasyFootballApp
                                             (((double)man.ap_wins + (0.5 * (double)man.ap_ties)) / (double)(man.ap_wins + man.ap_losses + man.ap_ties)).ToString("F5"));
                     }
                 }
-                // Display or manipulate the data here
+
                 dataGridViewAllPlay.DataSource = results;
                 dataGridViewAllPlay.Sort(dataGridViewAllPlay.Columns[6], ListSortDirection.Descending);
             }
@@ -549,6 +549,10 @@ namespace FantasyFootballApp
             {
                 e.Handled = true; // Block the input
             }
+            else if (e.KeyChar == (char)Keys.Enter)
+            {
+                this.buttonAllPlayReport_Click(sender, e);
+            }
         }
 
         private void textBoxWeekEnd_KeyPress(object sender, KeyPressEventArgs e)
@@ -557,6 +561,10 @@ namespace FantasyFootballApp
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
                 e.Handled = true; // Block the input
+            }
+            else if (e.KeyChar == (char)Keys.Enter)
+            {
+                this.buttonAllPlayReport_Click(sender, e);
             }
         }
 
@@ -567,6 +575,10 @@ namespace FantasyFootballApp
             {
                 e.Handled = true; // Block the input
             }
+            else if (e.KeyChar == (char)Keys.Enter)
+            {
+                this.buttonAllPlayReport_Click(sender, e);
+            }
         }
 
         private void textBoxSeasonStart_KeyPress(object sender, KeyPressEventArgs e)
@@ -575,6 +587,10 @@ namespace FantasyFootballApp
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
                 e.Handled = true; // Block the input
+            }
+            else if (e.KeyChar == (char)Keys.Enter)
+            {
+                this.buttonAllPlayReport_Click(sender, e);
             }
         }
 
@@ -602,6 +618,16 @@ namespace FantasyFootballApp
                     e.Cancel = true; // Prevents focus from leaving the textbox
                 }
             }
+        }
+
+        private void buttonHelp_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("These parameters are all optional and can be combined in any way.\n"+
+                            "Here is an explanation of what each field means.\n\n" +
+                            "Week Start: Only weeks equal to or later will be included\n" +
+                            "Week End: Only weeks before or equal to will be included\n"+
+                            "Season Start: Only seasons equal to or later will be included\n"+
+                            "Season End: Only seasons before or equal to will be included", "Additional Parameters (Optional) Explanation");
         }
     }
 }
