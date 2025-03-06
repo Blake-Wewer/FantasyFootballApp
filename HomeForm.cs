@@ -1,13 +1,12 @@
 using FantasyFootballApp.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Data;
-using System.Reflection;
 
 namespace FantasyFootballApp
 {
     public partial class HomeForm : Form
     {
+        public int user_permissions_value = 0;
         public int selectedLeague = -1;
         public string lastReportRan = string.Empty;
         public HomeForm()
@@ -53,7 +52,12 @@ namespace FantasyFootballApp
         {
             using (AppDbContext context = new AppDbContext())
             {
-                List<League> leagues = context.Leagues.ToList();
+                var leagues_query = context.Leagues.AsEnumerable();
+                if (user_permissions_value != 0)
+                {
+                    leagues_query = leagues_query.Where(l => (l.Permissions & user_permissions_value) != 0);
+                }
+                List<League> leagues = leagues_query.ToList();
                 // Display or manipulate the data here
                 List<ComboBoxItem> formattedLeagues = new List<ComboBoxItem>();
                 formattedLeagues.Add(new ComboBoxItem { ID = -1, Display = " - Select a League - " });

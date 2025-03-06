@@ -13,6 +13,9 @@ namespace FantasyFootballApp.Models
         [Column("name")]
         public required string Name { get; set; }
 
+        [Column("permissions")]
+        public required int Permissions { get; set; }
+
         [Column("create_date")]
         public required DateTime CreateDate { get; set; }
 
