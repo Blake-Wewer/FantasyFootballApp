@@ -8,7 +8,6 @@ namespace FantasyFootballApp
 {
     public partial class AllPlayForm : Form
     {
-        public int user_permissions_value = 0;
         public int selectedLeague = -1;
         public int selectedReport = -1;
 
@@ -42,9 +41,9 @@ namespace FantasyFootballApp
             using (AppDbContext context = new AppDbContext())
             {
                 var leagues_query = context.Leagues.AsEnumerable();
-                if (user_permissions_value != 0)
+                if (Permissions.league_permissions != 0)
                 {
-                    leagues_query = leagues_query.Where(l => (l.Permissions & user_permissions_value) != 0);
+                    leagues_query = leagues_query.Where(l => (l.Permissions & Permissions.league_permissions) != 0);
                 }
                 List<League> leagues = leagues_query.ToList();
 
