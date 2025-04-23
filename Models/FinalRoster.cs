@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FantasyFootballApp.Models
 {
+    [Table("final_rosters")]
     public class FinalRoster
     {
         [Key]
@@ -20,6 +21,9 @@ namespace FantasyFootballApp.Models
         [Column("roster_position")]
         [EnumDataType(typeof(string))]
         public required string RosterPosition { get; set; }
+
+        [Column("years_as_keeper")]
+        public required int YearsAsKeeper { get; set; }
 
 
         // Relationships

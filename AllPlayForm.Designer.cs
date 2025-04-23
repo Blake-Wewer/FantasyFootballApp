@@ -254,7 +254,7 @@
             Controls.Add(groupBoxAdditionalAllPlayParameters);
             MinimumSize = new Size(940, 500);
             Name = "AllPlayForm";
-            Text = "All-Play Form";
+            Text = "All-Play";
             Load += AllPlayForm_Load;
             groupBoxAdditionalAllPlayParameters.ResumeLayout(false);
             groupBoxAdditionalAllPlayParameters.PerformLayout();

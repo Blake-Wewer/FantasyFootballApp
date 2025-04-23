@@ -62,7 +62,13 @@ namespace FantasyFootballApp.Models
         [Column("moves")]
         public int? Moves { get; set; }
 
+        [Column("first_round_draft_pick")]
+        public required string FirstRoundDraftPick { get; set; }
+
         // Needs Rivalry Week Data and Projected Data
+
+        [Column("nut_cup_winner")]
+        public int? NutCupWinner { get; set; }
 
         [Column("create_date")]
         public required DateTime CreateDate { get; set; }
@@ -74,5 +80,40 @@ namespace FantasyFootballApp.Models
         // Relationships
 
         public virtual required Team Team { get; set; }
+
+
+        // Methods
+
+        public string RecordDisplay()
+        {
+            if (this.Wins == null) return "";
+
+            Record record = new Record(this.Wins ?? 0, this.Losses ?? 0, this.Ties ?? 0);
+            return record.Display();
+        }
+
+        public string RecordWinPerc()
+        {
+            if (this.Wins == null) return "";
+
+            Record record = new Record(this.Wins ?? 0, this.Losses ?? 0, this.Ties ?? 0);
+            return record.WinPerc();
+        }
+
+        public string RecordFullDisplay()
+        {
+            if (this.Wins == null) return "";
+
+            Record record = new Record(this.Wins ?? 0, this.Losses ?? 0, this.Ties ?? 0);
+            return record.FullDisplay();
+        }
+
+        public string RecordDisplayWithYear()
+        {
+            if (this.Wins == null) return "";
+
+            Record record = new Record(this.Wins ?? 0, this.Losses ?? 0, this.Ties ?? 0);
+            return record.Display() + " (" +  this.Team.LeagueSeason.Season.Name + ")";
+        }
     }
 }

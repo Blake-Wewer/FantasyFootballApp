@@ -41,5 +41,13 @@ namespace FantasyFootballApp.Models
         // Relationships
 
         public virtual ICollection<PlayerSeason>? Seasons { get; set; }
+
+
+        // Relationships
+        
+        public string FullName()
+        {
+            return this.FirstName + " " + this.LastName;
+        }
     }
 }

@@ -47,5 +47,9 @@ namespace FantasyFootballApp.Models
         public virtual required LeagueSeason LeagueSeason { get; set; }
 
         public virtual LeagueDivision? LeagueDivision { get; set; }
+
+        public virtual ICollection<DraftPick> DraftPicks { get; set; } = new List<DraftPick>();
+
+        public virtual ICollection<MatchupDetail> MatchupDetails { get; set; } = new List<MatchupDetail>();
     }
 }

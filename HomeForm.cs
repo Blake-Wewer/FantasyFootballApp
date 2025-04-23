@@ -23,11 +23,16 @@ namespace FantasyFootballApp
         private void TextBoxSeason_KeyPress(object sender, KeyPressEventArgs e)
         {
             // Allow numbers, Backspace, and Delete
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar)) {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
                 e.Handled = true; // Block the input
-            } else if (e.KeyChar == (char)Keys.Enter) {
-                if (lastReportRan != string.Empty) {
-                    switch (lastReportRan) {
+            }
+            else if (e.KeyChar == (char)Keys.Enter)
+            {
+                if (lastReportRan != string.Empty)
+                {
+                    switch (lastReportRan)
+                    {
                         case "btnManagers_Click":
                             this.btnManagers_Click(sender, e);
                             break;
@@ -354,6 +359,18 @@ namespace FantasyFootballApp
             {
                 selectedLeague = (int)comboBoxLeague.SelectedValue;
             }
+        }
+
+        private void buttonManager_Click(object sender, EventArgs e)
+        {
+            ManagerForm managerForm = new ManagerForm();
+            managerForm.ShowDialog();
+        }
+
+        private void buttonKeeperCalculation_Click(object sender, EventArgs e)
+        {
+            KeeperCalculationForm keeperCalculationForm = new KeeperCalculationForm();
+            keeperCalculationForm.ShowDialog();
         }
     }
 }

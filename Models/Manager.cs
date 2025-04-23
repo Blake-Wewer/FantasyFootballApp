@@ -38,5 +38,18 @@ namespace FantasyFootballApp.Models
         // Relationships
 
         public virtual required ICollection<Team> Teams { get; set; }
+
+
+        // Methods
+
+        public string ShortName()
+        {
+            return this.Nickname ?? this.FirstName;
+        }
+
+        public string FullName()
+        {
+            return this.FirstName + " " + this.LastName;
+        }
     }
 }

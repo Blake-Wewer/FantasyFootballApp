@@ -13,6 +13,12 @@ namespace FantasyFootballApp.Models
         [Column("name")]
         public required string Name { get; set; }
 
+        [Column("is_keeper")]
+        public required int isKeeper { get; set; }
+
+        [Column("keeper_max_years")]
+        public int? KeeperMaxYears { get; set; }
+
         [Column("permissions")]
         public required int Permissions { get; set; }
 
