@@ -175,8 +175,33 @@
                 foreach (var r in rosterWithPickDetails)
                 {
                     ListViewItem item = new ListViewItem(r.PlayerName);
-                    item.SubItems.Add(r.PickDetails != null
-                        ? $"{r.PickDetails.Pick} ({r.PickDetails.Round})"
+                    bool traded = false;
+                    DraftPick? traded_pick = null;
+                    if (r.PickDetails == null)
+                    {
+                        // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft pick for that player this past season as a trade most likely happened
+                        List<TransactionDetail> non_trade_transactions = context.TransactionDetails
+                                                                            .Include(td => td.Transaction)
+                                                                            .Include(tran => tran.Team)
+                                                                            .Where(td => td.Transaction.TransactionType != "Trade" && td.Team.LeagueSeasonId == context.Teams.Find(currentTeamID).LeagueSeasonId)
+                                                                            .ToList()
+                                                                            .Where(td => (td.AcquiredPlayerIds ?? "")
+                                                                                .Split(',')
+                                                                                .Contains(r.PlayerId.ToString()))
+                                                                            .ToList();
+                        if (non_trade_transactions.Count() == 0)
+                        {
+                            DraftPick? pick = context.DraftPicks.Include(dp => dp.Draft).ThenInclude(d => d.LeagueSeason).Where(dp => dp.PlayerId == r.PlayerId && dp.Draft.LeagueSeasonId == context.Teams.Find(currentTeamID).LeagueSeasonId).FirstOrDefault();
+                            if (pick != null)
+                            {
+                                traded_pick = pick;
+                                traded = true;
+                            }
+                        }
+                    }
+                    DraftPick? draft_pick = traded_pick ?? r.PickDetails;
+                    item.SubItems.Add(draft_pick != null
+                        ? $"{draft_pick.Pick} ({draft_pick.Round})" + (traded ? "  *Trade" : "")
                         : "FA");
                     item.Tag = r.PlayerId;
                     listViewFinalRoster.Items.Add(item);
@@ -197,6 +222,8 @@
                                         .FirstOrDefault();
 
                 FinalRoster fr_player = context.FinalRosters.Where(fr => fr.TeamId == currentTeamID && fr.PlayerId == selectedPlayer).First();
+                Player player = context.Players.Find(selectedPlayer);
+                textBoxPlayer.Text = player.FullName();
                 if (pick != null)
                 {
                     textBoxPick.Text = pick.Pick.ToString();
@@ -206,6 +233,26 @@
                 {
                     textBoxPick.Text = "-";
                     textBoxRound.Text = "-";
+
+                    // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft pick for that player this past season as a trade most likely happened
+                    List<TransactionDetail> non_trade_transactions = context.TransactionDetails
+                                                                        .Include(td => td.Transaction)
+                                                                        .Include(tran => tran.Team)
+                                                                        .Where(td => td.Transaction.TransactionType != "Trade" && td.Team.LeagueSeasonId == context.Teams.Find(currentTeamID).LeagueSeasonId)
+                                                                        .ToList()
+                                                                        .Where(td => (td.AcquiredPlayerIds ?? "")
+                                                                            .Split(',')
+                                                                            .Contains(selectedPlayer.ToString()))
+                                                                        .ToList();
+                    if (non_trade_transactions.Count() == 0)
+                    {
+                        DraftPick? traded_pick = context.DraftPicks.Include(dp => dp.Draft).ThenInclude(d => d.LeagueSeason).Where(dp => dp.PlayerId == selectedPlayer && dp.Draft.LeagueSeasonId == context.Teams.Find(currentTeamID).LeagueSeasonId).FirstOrDefault();
+                        if (traded_pick != null)
+                        {
+                            textBoxPick.Text = traded_pick.Pick.ToString();
+                            textBoxRound.Text = traded_pick.Round.ToString();
+                        }
+                    }
                 }
                 textBoxSeasonsKept.Text = fr_player.YearsAsKeeper.ToString();
             }
@@ -317,14 +364,35 @@
                 {
                     previous_pick_value = pick.Pick;
                     previous_round_value = pick.Round;
-                }
-                else if (checkBoxSecondWaiverKeeper.Checked == true)
+                } else
                 {
-                    previous_round_value = waiverSecondKeeperValue;
-                }
-                else
-                {
-                    previous_round_value = waiverKeeperValue;
+                    // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft pick for that player this past season as a trade most likely happened
+                    List<TransactionDetail> non_trade_transactions = context.TransactionDetails
+                                                                        .Include(td => td.Transaction)
+                                                                        .Include(tran => tran.Team)
+                                                                        .Where(td => td.Transaction.TransactionType != "Trade" && td.Team.LeagueSeasonId == context.Teams.Find(currentTeamID).LeagueSeasonId)
+                                                                        .ToList()
+                                                                        .Where(td => (td.AcquiredPlayerIds ?? "")
+                                                                            .Split(',')
+                                                                            .Contains(selectedPlayer.ToString()))
+                                                                        .ToList();
+                    if (non_trade_transactions.Count() == 0)
+                    {
+                        DraftPick? traded_pick = context.DraftPicks.Include(dp => dp.Draft).ThenInclude(d => d.LeagueSeason).Where(dp => dp.PlayerId == selectedPlayer && dp.Draft.LeagueSeasonId == context.Teams.Find(currentTeamID).LeagueSeasonId).FirstOrDefault();
+                        if (traded_pick != null)
+                        {
+                            previous_pick_value = traded_pick.Pick;
+                            previous_round_value = traded_pick.Round;
+                        }
+                    }
+                    else if (checkBoxSecondWaiverKeeper.Checked == true)
+                    {
+                        previous_round_value = waiverSecondKeeperValue;
+                    }
+                    else
+                    {
+                        previous_round_value = waiverKeeperValue;
+                    }
                 }
 
                 // Method 1 (Round Bumping)

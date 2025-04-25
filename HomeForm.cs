@@ -181,7 +181,7 @@ namespace FantasyFootballApp
                         List<object> row = new List<object>() { i };
                         foreach (int s in seasons)
                         {
-                            Team team = standings.Where(t => t.TeamDetail.Finish == i && t.LeagueSeason.Season.Name == s).FirstOrDefault();
+                            Team? team = standings.Where(t => t.TeamDetail.Finish == i && t.LeagueSeason.Season.Name == s).FirstOrDefault();
                             if (team != null)
                             {
                                 string record = team.TeamDetail.Wins != null

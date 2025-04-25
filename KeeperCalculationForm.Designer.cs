@@ -51,6 +51,8 @@
             textBoxPick = new TextBox();
             labelPick = new Label();
             listViewFinalRoster = new ListView();
+            textBoxPlayer = new TextBox();
+            labelPlayer = new Label();
             groupBoxKeeperCalculationResults.SuspendLayout();
             SuspendLayout();
             // 
@@ -110,6 +112,8 @@
             // groupBoxKeeperCalculationResults
             // 
             groupBoxKeeperCalculationResults.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
+            groupBoxKeeperCalculationResults.Controls.Add(textBoxPlayer);
+            groupBoxKeeperCalculationResults.Controls.Add(labelPlayer);
             groupBoxKeeperCalculationResults.Controls.Add(textBoxKeeperValue);
             groupBoxKeeperCalculationResults.Controls.Add(labelKeeperValue);
             groupBoxKeeperCalculationResults.Controls.Add(textBoxMethod2Value);
@@ -229,7 +233,7 @@
             // textBoxSeasonsKept
             // 
             textBoxSeasonsKept.Enabled = false;
-            textBoxSeasonsKept.Location = new Point(140, 58);
+            textBoxSeasonsKept.Location = new Point(140, 92);
             textBoxSeasonsKept.Name = "textBoxSeasonsKept";
             textBoxSeasonsKept.Size = new Size(42, 23);
             textBoxSeasonsKept.TabIndex = 5;
@@ -238,7 +242,7 @@
             // 
             labelSeasonsKept.AutoSize = true;
             labelSeasonsKept.Enabled = false;
-            labelSeasonsKept.Location = new Point(55, 61);
+            labelSeasonsKept.Location = new Point(55, 95);
             labelSeasonsKept.Name = "labelSeasonsKept";
             labelSeasonsKept.Size = new Size(79, 15);
             labelSeasonsKept.TabIndex = 4;
@@ -247,7 +251,7 @@
             // textBoxRound
             // 
             textBoxRound.Enabled = false;
-            textBoxRound.Location = new Point(171, 22);
+            textBoxRound.Location = new Point(171, 56);
             textBoxRound.Name = "textBoxRound";
             textBoxRound.Size = new Size(42, 23);
             textBoxRound.TabIndex = 3;
@@ -256,7 +260,7 @@
             // 
             labelRound.AutoSize = true;
             labelRound.Enabled = false;
-            labelRound.Location = new Point(120, 25);
+            labelRound.Location = new Point(120, 59);
             labelRound.Name = "labelRound";
             labelRound.Size = new Size(45, 15);
             labelRound.TabIndex = 2;
@@ -265,7 +269,7 @@
             // textBoxPick
             // 
             textBoxPick.Enabled = false;
-            textBoxPick.Location = new Point(62, 22);
+            textBoxPick.Location = new Point(62, 56);
             textBoxPick.Name = "textBoxPick";
             textBoxPick.Size = new Size(42, 23);
             textBoxPick.TabIndex = 1;
@@ -274,7 +278,7 @@
             // 
             labelPick.AutoSize = true;
             labelPick.Enabled = false;
-            labelPick.Location = new Point(24, 25);
+            labelPick.Location = new Point(24, 59);
             labelPick.Name = "labelPick";
             labelPick.Size = new Size(32, 15);
             labelPick.TabIndex = 0;
@@ -291,6 +295,24 @@
             listViewFinalRoster.UseCompatibleStateImageBehavior = false;
             listViewFinalRoster.View = View.Details;
             listViewFinalRoster.SelectedIndexChanged += listViewFinalRoster_SelectedIndexChanged;
+            // 
+            // textBoxPlayer
+            // 
+            textBoxPlayer.Enabled = false;
+            textBoxPlayer.Location = new Point(54, 20);
+            textBoxPlayer.Name = "textBoxPlayer";
+            textBoxPlayer.Size = new Size(176, 23);
+            textBoxPlayer.TabIndex = 17;
+            // 
+            // labelPlayer
+            // 
+            labelPlayer.AutoSize = true;
+            labelPlayer.Enabled = false;
+            labelPlayer.Location = new Point(6, 23);
+            labelPlayer.Name = "labelPlayer";
+            labelPlayer.Size = new Size(42, 15);
+            labelPlayer.TabIndex = 16;
+            labelPlayer.Text = "Player:";
             // 
             // KeeperCalculationForm
             // 
@@ -339,5 +361,7 @@
         private Label labelMethod1Value;
         private TextBox textBoxKeeperValue;
         private Label labelKeeperValue;
+        private TextBox textBoxPlayer;
+        private Label labelPlayer;
     }
 }

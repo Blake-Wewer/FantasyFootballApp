@@ -135,8 +135,8 @@
             reports.Add(new ComboBoxItem { ID = 4, Display = "Rivalry Week" });
 
             reports.Add(new ComboBoxItem { ID = 5, Display = "Personal Record Book" });
-            //reports.Add(new ComboBoxItem { ID = 6, Display = "All-Time VS Records" });
-            //reports.Add(new ComboBoxItem { ID = 7, Display = "All-Time VS Stats" });
+            reports.Add(new ComboBoxItem { ID = 6, Display = "All-Time VS Records" });
+            reports.Add(new ComboBoxItem { ID = 7, Display = "All-Time VS Stats" });
 
             comboBoxReport.DataSource = reports.ToArray();
             comboBoxReport.DisplayMember = "Display";
@@ -254,7 +254,7 @@
                         PersonalRecordBook();
                         break;
                     case 6:
-                        //AllTimeVSRecords();
+                        AllTimeVSRecords();
                         break;
                     case 7:
                         //AllTimeVSStats();
@@ -484,6 +484,9 @@
             }
         }
 
+        /// <summary>
+        /// The SeasonResults
+        /// </summary>
         private void SeasonResults()
         {
             using (AppDbContext context = new AppDbContext())
@@ -537,6 +540,9 @@
             }
         }
 
+        /// <summary>
+        /// The RivalryWeekResults
+        /// </summary>
         private void RivalryWeekResults()
         {
             using (AppDbContext context = new AppDbContext())
@@ -571,7 +577,7 @@
                 results.Columns.Add("Result \n* = Nut Cup Game", typeof(string));
                 results.Columns.Add("Score", typeof(string));
 
-                foreach(MatchupDetail md in rivalry_week_matchup_details)
+                foreach (MatchupDetail md in rivalry_week_matchup_details)
                 {
                     MatchupDetail opp_md = md.Matchup.MatchupDetails.Where(o => o.Id != md.Id).First();
                     string result = (md.TeamPoints > opp_md.TeamPoints ? "W" : (md.TeamPoints < opp_md.TeamPoints ? "L" : (md.TeamPoints == opp_md.TeamPoints ? "T" : "-"))) + (md.Matchup.NutCupMatchup == 1 ? "*" : "");
@@ -587,6 +593,10 @@
             }
         }
 
+        /// <summary>
+        /// The PersonalRecordBook
+        /// TODO: Fix Season Proj stats
+        /// </summary>
         private void PersonalRecordBook()
         {
             using (AppDbContext context = new AppDbContext())
@@ -672,18 +682,18 @@
 
                 // Gathering matchup details for later records
                 var all_matchup_details = teams.SelectMany(team => team.MatchupDetails.Select(md => new
-                                             {
-                                                 Team = team,
-                                                 MatchupDetail = md,
-                                                 Opponent = md.Matchup.MatchupDetails.FirstOrDefault(opp => opp.TeamId != md.TeamId)
-                                             }))
+                {
+                    Team = team,
+                    MatchupDetail = md,
+                    Opponent = md.Matchup.MatchupDetails.FirstOrDefault(opp => opp.TeamId != md.TeamId)
+                }))
                                             .Where(x => x.Opponent != null)
                                             .Select(x => new
                                             {
                                                 Points = x.MatchupDetail.TeamPoints,
                                                 ProjPoints = x.MatchupDetail.TeamProjPoints,
                                                 OppPoints = x.Opponent.TeamPoints,
-                                                ProjOppPoints = x.Opponent.TeamProjPoints,
+                                                OppProjPoints = x.Opponent.TeamProjPoints,
                                                 Week = x.MatchupDetail.Matchup.Week,
                                                 LeagueSeasonId = x.MatchupDetail.Matchup.LeagueSeasonId,
                                                 Season = x.Team.LeagueSeason.Season.Name,
@@ -705,10 +715,10 @@
                 }
 
                 var avg_points_scored_week = avg_points_scored_week_query.GroupBy(md => new
-                                                 {
-                                                     md.Team.LeagueSeasonId,
-                                                     md.Matchup.Week
-                                                 })
+                {
+                    md.Team.LeagueSeasonId,
+                    md.Matchup.Week
+                })
                                                 .Select(g => new
                                                 {
                                                     LeagueSeasonId = g.Key.LeagueSeasonId,
@@ -756,10 +766,10 @@
                 results.Rows.Add("Relative Points Against (Week)", rel_points_against_week.best, rel_points_against_week.worst);
 
                 // Relative Points Against vs Proj (Week)
-                var best_rel_points_against_vs_proj_week = all_matchup_details.OrderByDescending(t => t.OppPoints / t.ProjOppPoints).First();
-                var worst_rel_points_against_vs_proj_week = all_matchup_details.OrderBy(t => t.OppPoints / t.ProjOppPoints).First();
-                (string best, string worst) rel_points_against_vs_proj_week = (Math.Round(((best_rel_points_against_vs_proj_week.OppPoints / (double)best_rel_points_against_vs_proj_week.ProjOppPoints) - 1) * 100, 3).ToString("F3") + "% (vs " + best_rel_points_against_vs_proj_week.OpponentManager + ", W" + best_rel_points_against_vs_proj_week.Week + ", " + best_rel_points_against_vs_proj_week.Season + ")",
-                                                                        Math.Round(((worst_rel_points_against_vs_proj_week.OppPoints / (double)worst_rel_points_against_vs_proj_week.ProjOppPoints) - 1) * 100, 3).ToString("F3") + "% (vs " + worst_rel_points_against_vs_proj_week.OpponentManager + ", W" + worst_rel_points_against_vs_proj_week.Week + ", " + worst_rel_points_against_vs_proj_week.Season + ")");
+                var best_rel_points_against_vs_proj_week = all_matchup_details.OrderByDescending(t => t.OppPoints / t.OppProjPoints).First();
+                var worst_rel_points_against_vs_proj_week = all_matchup_details.OrderBy(t => t.OppPoints / t.OppProjPoints).First();
+                (string best, string worst) rel_points_against_vs_proj_week = (Math.Round(((best_rel_points_against_vs_proj_week.OppPoints / (double)best_rel_points_against_vs_proj_week.OppProjPoints) - 1) * 100, 3).ToString("F3") + "% (vs " + best_rel_points_against_vs_proj_week.OpponentManager + ", W" + best_rel_points_against_vs_proj_week.Week + ", " + best_rel_points_against_vs_proj_week.Season + ")",
+                                                                        Math.Round(((worst_rel_points_against_vs_proj_week.OppPoints / (double)worst_rel_points_against_vs_proj_week.OppProjPoints) - 1) * 100, 3).ToString("F3") + "% (vs " + worst_rel_points_against_vs_proj_week.OpponentManager + ", W" + worst_rel_points_against_vs_proj_week.Week + ", " + worst_rel_points_against_vs_proj_week.Season + ")");
                 results.Rows.Add("Relative Points Against vs Proj (Week)", rel_points_against_vs_proj_week.best, rel_points_against_vs_proj_week.worst);
 
                 // Relative Points Against vs Proj (Season)
@@ -780,9 +790,9 @@
                 results.Rows.Add("Relative Moves (Season)", rel_moves.best, rel_moves.worst);
 
                 // Margin of Victory
-                var best_mov= all_matchup_details.OrderByDescending(x => x.Points - x.OppPoints).FirstOrDefault();
-                var worst_mov= all_matchup_details.OrderBy(x => x.Points - x.OppPoints).FirstOrDefault();
-                (string best, string worst) mov= (Math.Round(best_mov.Points - best_mov.OppPoints, 2).ToString("F2") + " (vs " + best_mov.OpponentManager + ", W" + best_mov.Week + ", " + best_mov.Season + ")",
+                var best_mov = all_matchup_details.OrderByDescending(x => x.Points - x.OppPoints).FirstOrDefault();
+                var worst_mov = all_matchup_details.OrderBy(x => x.Points - x.OppPoints).FirstOrDefault();
+                (string best, string worst) mov = (Math.Round(best_mov.Points - best_mov.OppPoints, 2).ToString("F2") + " (vs " + best_mov.OpponentManager + ", W" + best_mov.Week + ", " + best_mov.Season + ")",
                                                         Math.Round(worst_mov.Points - worst_mov.OppPoints, 2).ToString("F2") + " (vs " + worst_mov.OpponentManager + ", W" + worst_mov.Week + ", " + worst_mov.Season + ")");
                 results.Rows.Add("Margin of Victory", mov.best, mov.worst);
 
@@ -800,9 +810,221 @@
                                                         Math.Round(worst_nut_cup_mov.Points - worst_nut_cup_mov.OppPoints, 2).ToString("F2") + " (vs " + worst_nut_cup_mov.OpponentManager + ", W" + worst_nut_cup_mov.Week + ", " + worst_nut_cup_mov.Season + ")");
                 results.Rows.Add("Nut Cup Margin of Victory", nut_cup_mov.best, nut_cup_mov.worst);
 
+                dataGridViewManager.DataSource = results;
+            }
+        }
+
+        /// <summary>
+        /// The AllTimeVSRecords
+        /// TODO: Add Total Row
+        /// </summary>
+        private void AllTimeVSRecords()
+        {
+            using (AppDbContext context = new AppDbContext())
+            {
+                var teams_query = context.Teams
+                                    .Include(t => t.TeamDetail)
+                                    .Include(t => t.LeagueSeason)
+                                        .ThenInclude(ls => ls.Season)
+                                    .Include(t => t.MatchupDetails)
+                                        .ThenInclude(md => md.Matchup)
+                                        .ThenInclude(mat => mat.MatchupDetails)
+                                        .ThenInclude(md => md.Team)
+                                        .ThenInclude(t => t.Manager)
+                                    .Where(t => t.ManagerId == selectedManager && permittedLeagues.Contains(t.LeagueSeason.LeagueId))
+                                    .AsQueryable();
+                if (!checkBoxUseAllLeagues.Checked)
+                {
+                    teams_query = teams_query.Where(t => selectedLeagues.Contains(t.LeagueSeason.LeagueId));
+                }
+                List<Team> teams = teams_query.ToList();
+
+                // Gathering matchup details for later records
+                var all_matchup_details = teams.SelectMany(team => team.MatchupDetails.Select(md => new
+                {
+                    Team = team,
+                    MatchupDetail = md,
+                    Opponent = md.Matchup.MatchupDetails.FirstOrDefault(opp => opp.TeamId != md.TeamId)
+                }))
+                                            .Where(x => x.Opponent != null)
+                                            .Select(x => new
+                                            {
+                                                Points = x.MatchupDetail.TeamPoints,
+                                                ProjPoints = x.MatchupDetail.TeamProjPoints,
+                                                OppPoints = x.Opponent.TeamPoints,
+                                                OppProjPoints = x.Opponent.TeamProjPoints,
+                                                Week = x.MatchupDetail.Matchup.Week,
+                                                LeagueSeasonId = x.MatchupDetail.Matchup.LeagueSeasonId,
+                                                Season = x.Team.LeagueSeason.Season.Name,
+                                                OpponentManagerId = x.Opponent.Team.Manager.Id,
+                                                OpponentManager = x.Opponent.Team.Manager.Nickname ?? x.Opponent.Team.Manager.FirstName,
+                                                isRivalryWeek = x.MatchupDetail.Matchup.RivalryWeekMatchup,
+                                                isNutCup = x.MatchupDetail.Matchup.NutCupMatchup
+                                            })
+                                            .ToList();
+                // Gathering average points scored in each week for later records
+                var avg_points_scored_week_query = context.MatchupDetails
+                                                .Include(md => md.Matchup)
+                                                    .ThenInclude(mat => mat.LeagueSeason)
+                                                .Where(md => permittedLeagues.Contains(md.Matchup.LeagueSeason.LeagueId))
+                                                .AsQueryable();
+                if (!checkBoxUseAllLeagues.Checked)
+                {
+                    avg_points_scored_week_query = avg_points_scored_week_query.Where(t => selectedLeagues.Contains(t.Matchup.LeagueSeason.LeagueId));
+                }
+                var avg_points_scored_week = avg_points_scored_week_query.GroupBy(md => new
+                {
+                    md.Team.LeagueSeasonId,
+                    md.Matchup.Week
+                })
+                                                .Select(g => new
+                                                {
+                                                    LeagueSeasonId = g.Key.LeagueSeasonId,
+                                                    Week = g.Key.Week,
+                                                    AveragePoints = g.Average(md => md.TeamPoints)
+                                                })
+                                                .ToList();
+
+                DataTable results = new DataTable();
+                results.Columns.Add("Opponent", typeof(string));
+                results.Columns.Add("Total Record", typeof(string));
+                results.Columns.Add("Total Win %", typeof(string));
+                results.Columns.Add("Favored Record", typeof(string));
+                results.Columns.Add("Favored Win %", typeof(string));
+                results.Columns.Add("Underdog Record", typeof(string));
+                results.Columns.Add("Underdog Win %", typeof(string));
+                results.Columns.Add("Upsets Record", typeof(string));
+                results.Columns.Add("Upsets Win %", typeof(string));
+                results.Columns.Add("Blowouts Record", typeof(string));
+                results.Columns.Add("Blowouts Win %", typeof(string));
+                results.Columns.Add("Nailbiters Record", typeof(string));
+                results.Columns.Add("Nailbiters Win %", typeof(string));
+                results.Columns.Add("Against Proj. Spread Record", typeof(string));
+                results.Columns.Add("Against Proj. Spread Win %", typeof(string));
+
+                List<(
+                        int opp_id,
+                        string opp_name,
+                        Record total,
+                        Record favored,
+                        Record underdog,
+                        Record upsets,
+                        Record blowouts,
+                        Record nailbiters,
+                        Record vs_spread
+                    )> vs_records = new List<(int, string, Record, Record, Record, Record, Record, Record, Record)>();
+
+                foreach (int opp_m in all_matchup_details.Select(x => x.OpponentManagerId).Distinct().ToList())
+                {
+                    Record total = new Record();
+                    Record favored = new Record();
+                    Record underdog = new Record();
+                    Record upsets = new Record();
+                    Record blowouts = new Record();
+                    Record nailbiters = new Record();
+                    Record vs_spread = new Record();
+
+                    var opp_matchup_details = all_matchup_details.Where(x => x.OpponentManagerId == opp_m).ToList();
+
+                    foreach (var md in opp_matchup_details)
+                    {
+                        if (md.Points > md.OppPoints)
+                        {
+                            total.Win();
+                            if (md.ProjPoints > md.OppProjPoints) favored.Win();
+                            if (md.ProjPoints < md.OppProjPoints) underdog.Win();
+                            if (md.ProjPoints <= md.OppProjPoints - 10.0) upsets.Win();
+                            if (Math.Abs(md.Points - md.OppPoints) > 20.0) blowouts.Win();
+                            if (Math.Abs(md.Points - md.OppPoints) < 5.0) nailbiters.Win();
+
+                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints) vs_spread.Win();
+                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints) vs_spread.Loss();
+                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints) vs_spread.Tie();
+                        }
+                        else if (md.Points < md.OppPoints)
+                        {
+                            total.Loss();
+                            if (md.ProjPoints > md.OppProjPoints) favored.Loss();
+                            if (md.ProjPoints < md.OppProjPoints) underdog.Loss();
+                            if (md.ProjPoints - 10.0 >= md.OppProjPoints) upsets.Loss();
+                            if (Math.Abs(md.Points - md.OppPoints) > 20.0) blowouts.Loss();
+                            if (Math.Abs(md.Points - md.OppPoints) < 5.0) nailbiters.Loss();
+
+                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints) vs_spread.Win();
+                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints) vs_spread.Loss();
+                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints) vs_spread.Tie();
+                        }
+                        else
+                        {
+                            total.Tie();
+                            if (md.ProjPoints > md.OppProjPoints) favored.Tie();
+                            if (md.ProjPoints < md.OppProjPoints) underdog.Tie();
+                            if (Math.Abs(md.Points - md.OppPoints) > 20.0) blowouts.Tie();
+                            if (Math.Abs(md.Points - md.OppPoints) < 5.0) nailbiters.Tie();
+
+                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints) vs_spread.Win();
+                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints) vs_spread.Loss();
+                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints) vs_spread.Tie();
+                        }
+                    }
+
+                    vs_records.Add((
+                        opp_m,
+                        opp_matchup_details.First().OpponentManager,
+                        total,
+                        favored,
+                        underdog,
+                        upsets,
+                        blowouts,
+                        nailbiters,
+                        vs_spread
+                        ));
+
+                }
+
+                foreach (var record in vs_records.OrderBy(x => x.opp_name)) results.Rows.Add(record.opp_name,
+                                                                        record.total.Display(), record.total.WinPerc(),
+                                                                        record.favored.Display(), record.favored.WinPerc(),
+                                                                        record.underdog.Display(), record.underdog.WinPerc(),
+                                                                        record.upsets.Display(), record.upsets.WinPerc(),
+                                                                        record.blowouts.Display(), record.blowouts.WinPerc(),
+                                                                        record.nailbiters.Display(), record.nailbiters.WinPerc(),
+                                                                        record.vs_spread.Display(), record.vs_spread.WinPerc());
 
                 dataGridViewManager.DataSource = results;
             }
+        }
+
+        public class StatCollection
+        {
+            public StatCollection()
+            {
+                this.Display = "";
+                this.Max = double.MinValue;
+                this.Min = double.MaxValue;
+                this.Avg = 0.0;
+            }
+
+            public StatCollection(string display, double max, double min, double avg)
+            {
+                Display = display;
+                Max = max;
+                Min = min;
+                Avg = avg;
+            }
+
+            public StatCollection(double max, double min, double avg)
+            {
+                Display = "";
+                Max = max;
+                Min = min;
+                Avg = avg;
+            }
+
+            public required string Display { get; set; }
+            public required double Max { get; set; }
+            public required double Min { get; set; }
+            public required double Avg { get; set; }
         }
     }
 }
