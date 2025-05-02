@@ -147,7 +147,6 @@
                                 .Select(t => t.Id)
                                 .First();
 
-                // TODO: In the following query, we need to still get details if player was received in a trade and if they are Keeper Eligible
                 var keeper_eligible_players = context.FinalRosters
                                                 .Include(fr => fr.Player)
                                                 .Include(fr => fr.Team)
@@ -160,7 +159,7 @@
                                                 })
                                                 .ToList();
 
-                // Project the data first with pick details
+                // Project the data first with initial_pick details
                 var rosterWithPickDetails = keeper_eligible_players
                                                 .Select(r => new
                                                 {
@@ -179,7 +178,7 @@
                     DraftPick? traded_pick = null;
                     if (r.PickDetails == null)
                     {
-                        // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft pick for that player this past season as a trade most likely happened
+                        // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft initial_pick for that player this past season as a trade most likely happened
                         List<TransactionDetail> non_trade_transactions = context.TransactionDetails
                                                                             .Include(td => td.Transaction)
                                                                             .Include(tran => tran.Team)
@@ -234,7 +233,7 @@
                     textBoxPick.Text = "-";
                     textBoxRound.Text = "-";
 
-                    // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft pick for that player this past season as a trade most likely happened
+                    // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft initial_pick for that player this past season as a trade most likely happened
                     List<TransactionDetail> non_trade_transactions = context.TransactionDetails
                                                                         .Include(td => td.Transaction)
                                                                         .Include(tran => tran.Team)
@@ -344,29 +343,32 @@
                 {
                     if (fr_player.YearsAsKeeper >= league.KeeperMaxYears)
                     {
-                        textBoxMethod1Value.Text = "-";
-                        textBoxMethod2Value.Text = "-";
-                        textBoxKeeperValue.Text = "-";
+                        textBoxMethodA1Value.Text = "-";
+                        textBoxMethodA2Value.Text = "-";
+                        textBoxMethodAValue.Text = "-";
                         ErrorMessages.PlayerKeeperEligibilityExhaustedMessageBox();
                     }
                 }
 
-                DraftPick? pick = context.DraftPicks
+                DraftPick? initial_pick = context.DraftPicks
                                     .Include(dp => dp.Team)
-                                    .Where(dp => dp.PlayerId == selectedPlayer && dp.TeamId == currentTeamID)
+                                        .ThenInclude(d => d.LeagueSeason)
+                                        .ThenInclude(ls => ls.Season)
+                                    .Where(dp => dp.PlayerId == selectedPlayer && dp.Team.ManagerId == selectedManager && dp.Team.LeagueSeason.LeagueId == selectedLeague && dp.IsKeeper == 0)
+                                    .OrderByDescending(dp => dp.Team.LeagueSeason.Season.Name)
                                     .FirstOrDefault();
                 LeagueSeason most_recent_season = context.LeagueSeasons.Include(ls => ls.Season).Where(ls => ls.LeagueId == selectedLeague).OrderByDescending(ls => ls.Season.Name).First();
 
-                int previous_pick_value = -1;
-                int previous_round_value = -1;
+                int initial_pick_value = -1;
+                int initial_round_value = -1;
 
-                if (pick != null)
+                if (initial_pick != null)
                 {
-                    previous_pick_value = pick.Pick;
-                    previous_round_value = pick.Round;
+                    initial_pick_value = initial_pick.Pick;
+                    initial_round_value = initial_pick.Round;
                 } else
                 {
-                    // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft pick for that player this past season as a trade most likely happened
+                    // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft initial_pick for that player this past season as a trade most likely happened
                     List<TransactionDetail> non_trade_transactions = context.TransactionDetails
                                                                         .Include(td => td.Transaction)
                                                                         .Include(tran => tran.Team)
@@ -378,36 +380,115 @@
                                                                         .ToList();
                     if (non_trade_transactions.Count() == 0)
                     {
-                        DraftPick? traded_pick = context.DraftPicks.Include(dp => dp.Draft).ThenInclude(d => d.LeagueSeason).Where(dp => dp.PlayerId == selectedPlayer && dp.Draft.LeagueSeasonId == context.Teams.Find(currentTeamID).LeagueSeasonId).FirstOrDefault();
+                        DraftPick? traded_pick = context.DraftPicks
+                                                    .Include(dp => dp.Draft)
+                                                        .ThenInclude(d => d.LeagueSeason)
+                                                        .ThenInclude(ls => ls.Season)
+                                                    .Where(dp => dp.PlayerId == selectedPlayer && dp.Draft.LeagueSeason.LeagueId == selectedLeague && dp.IsKeeper == 0)
+                                                    .OrderByDescending(dp => dp.Draft.LeagueSeason.Season.Name)
+                                                    .FirstOrDefault();
                         if (traded_pick != null)
                         {
-                            previous_pick_value = traded_pick.Pick;
-                            previous_round_value = traded_pick.Round;
+                            initial_pick_value = traded_pick.Pick;
+                            initial_round_value = traded_pick.Round;
                         }
                     }
                     else if (checkBoxSecondWaiverKeeper.Checked == true)
                     {
-                        previous_round_value = waiverSecondKeeperValue;
+                        initial_round_value = waiverSecondKeeperValue;
                     }
                     else
                     {
-                        previous_round_value = waiverKeeperValue;
+                        initial_round_value = waiverKeeperValue;
                     }
                 }
 
-                // Method 1 (Round Bumping)
-                int method1Value = previous_round_value - (2 * (fr_player.YearsAsKeeper)) > 0 ? previous_round_value - (2 * (fr_player.YearsAsKeeper)) : 1;
+                // Method A1 (Round Bumping)
+                int methodA1Value = initial_round_value - (2 * (fr_player.YearsAsKeeper)) > 0 ? initial_round_value - (2 * (fr_player.YearsAsKeeper)) : 1;
 
-                // Method 2 (ADP Avg. Calculation)
-                if (previous_pick_value == -1) previous_pick_value = 1 + (previous_round_value - 1) * most_recent_season.NumTeams;
-                int method2Value = (int)Math.Truncate((((Math.Truncate(((double)previous_pick_value + currentADP) / 2) - 1) / most_recent_season.NumTeams) + 1));
+                // Method a2 (ADP Avg. Calculation)
+                if (initial_pick_value == -1) initial_pick_value = 1 + (initial_round_value - 1) * most_recent_season.NumTeams;
+                int methodA2Value = (int)Math.Truncate((((Math.Truncate(((double)initial_pick_value + currentADP) / 2) - 1) / most_recent_season.NumTeams) + 1));
 
                 // Find min
-                int keeper_value = Math.Min(method1Value, method2Value);
+                int methodAValue = Math.Min(methodA1Value, methodA2Value);
 
                 // Display Values
-                textBoxMethod1Value.Text = method1Value.ToString();
-                textBoxMethod2Value.Text = method2Value.ToString();
+                textBoxMethodA1Value.Text = methodA1Value.ToString();
+                textBoxMethodA2Value.Text = methodA2Value.ToString();
+                textBoxMethodAValue.Text = methodAValue.ToString();
+
+
+
+                DraftPick? most_recent_pick = context.DraftPicks
+                                    .Include(dp => dp.Team)
+                                        .ThenInclude(d => d.LeagueSeason)
+                                        .ThenInclude(ls => ls.Season)
+                                    .Where(dp => dp.PlayerId == selectedPlayer && dp.Team.ManagerId == selectedManager && dp.Team.LeagueSeason.LeagueId == selectedLeague)
+                                    .OrderByDescending(dp => dp.Team.LeagueSeason.Season.Name)
+                                    .FirstOrDefault();
+
+                int most_recent_pick_value = -1;
+                int most_recent_round_value = -1;
+
+                if (most_recent_pick != null)
+                {
+                    most_recent_pick_value = most_recent_pick.Pick;
+                    most_recent_round_value = most_recent_pick.Round;
+                }
+                else
+                {
+                    // Check if there was a non-trade transaction regarding this player this past season, if not, grab the draft most_recent_pick for that player this past season as a trade most likely happened
+                    List<TransactionDetail> non_trade_transactions = context.TransactionDetails
+                                                                        .Include(td => td.Transaction)
+                                                                        .Include(tran => tran.Team)
+                                                                        .Where(td => td.Transaction.TransactionType != "Trade" && td.Team.LeagueSeasonId == context.Teams.Find(currentTeamID).LeagueSeasonId)
+                                                                        .ToList()
+                                                                        .Where(td => (td.AcquiredPlayerIds ?? "")
+                                                                            .Split(',')
+                                                                            .Contains(selectedPlayer.ToString()))
+                                                                        .ToList();
+                    if (non_trade_transactions.Count() == 0)
+                    {
+                        DraftPick? traded_pick = context.DraftPicks
+                                                    .Include(dp => dp.Draft)
+                                                        .ThenInclude(d => d.LeagueSeason)
+                                                        .ThenInclude(ls => ls.Season)
+                                                    .Where(dp => dp.PlayerId == selectedPlayer && dp.Draft.LeagueSeason.LeagueId == selectedLeague)
+                                                    .OrderByDescending(dp => dp.Draft.LeagueSeason.Season.Name)
+                                                    .FirstOrDefault();
+                        if (traded_pick != null)
+                        {
+                            most_recent_pick_value = traded_pick.Pick;
+                            most_recent_round_value = traded_pick.Round;
+                        }
+                    }
+                    else if (checkBoxSecondWaiverKeeper.Checked == true)
+                    {
+                        most_recent_round_value = waiverSecondKeeperValue;
+                    }
+                    else
+                    {
+                        most_recent_round_value = waiverKeeperValue;
+                    }
+                }
+
+                // Method B1 (Round Bumping)
+                int methodB1Value = most_recent_round_value - ((fr_player.YearsAsKeeper)) > 0 ? most_recent_round_value - ((fr_player.YearsAsKeeper)) : 1;
+
+                // Method B2 (ADP Avg. Calculation)
+                if (most_recent_pick_value == -1) most_recent_pick_value = 1 + (most_recent_round_value - 1) * most_recent_season.NumTeams;
+                int methodB2Value = (int)Math.Truncate((((Math.Truncate(((double)most_recent_pick_value + currentADP) / 2) - 1) / most_recent_season.NumTeams) + 1));
+
+                // Find min
+                int methodBValue = Math.Min(methodB1Value, methodB2Value);
+
+                // Display Values
+                textBoxMethodB1Value.Text = methodB1Value.ToString();
+                textBoxMethodB2Value.Text = methodB2Value.ToString();
+                textBoxMethodBValue.Text = methodBValue.ToString();
+
+                int keeper_value = (int)Math.Ceiling(((double)methodAValue + (double)methodBValue) / 2.0);
                 textBoxKeeperValue.Text = keeper_value.ToString();
             }
         }

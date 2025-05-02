@@ -29,6 +29,13 @@ namespace FantasyFootballApp.Models
         [Column("player_id")]
         public required int PlayerId { get; set; }
 
+        [Column("is_keeper")]
+        public required int IsKeeper { get; set; }
+
+        [ForeignKey("DraftPick")]
+        [Column("keeper_pick_id")]
+        public int? KeeperPickId { get; set; }
+
         [Column("avg_pick")]
         public double? AvgPick { get; set; }
 
@@ -52,5 +59,7 @@ namespace FantasyFootballApp.Models
         public virtual required Team Team { get; set; }
 
         public virtual required Player Player { get; set; }
+
+        public virtual DraftPick? KeeperPick { get; set; }
     }
 }

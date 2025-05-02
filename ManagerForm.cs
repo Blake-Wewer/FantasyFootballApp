@@ -24,6 +24,8 @@
         /// </summary>
         public int selectedReport = -1;
 
+        public bool has_rivalry_weeks = false;
+
         /// <summary>
         /// Defines the selectedLeagues
         /// </summary>
@@ -81,6 +83,7 @@
                 List<ComboBoxItem> formattedLeagues = new List<ComboBoxItem>();
                 foreach (League league in leagues)
                 {
+                    if (league.LeagueSeasons.Any(ls => ls.RivalryWeeks != null && ls.RivalryWeeks != "")) has_rivalry_weeks = true;
                     formattedLeagues.Add(new ComboBoxItem { ID = league.Id, Display = league.Name });
                 }
                 permittedLeagues = formattedLeagues.Select(l => l.ID).ToList();
@@ -132,11 +135,11 @@
             reports.Add(new ComboBoxItem { ID = 3, Display = "Season Results" });       // Season Results + First Draft Pick History
 
             // TODO: Need to put the Rivalry Week report behind a query that checks existence based on permitted leagues
-            reports.Add(new ComboBoxItem { ID = 4, Display = "Rivalry Week" });
+            if (has_rivalry_weeks)  reports.Add(new ComboBoxItem { ID = 4, Display = "Rivalry Week" });
 
             reports.Add(new ComboBoxItem { ID = 5, Display = "Personal Record Book" });
             reports.Add(new ComboBoxItem { ID = 6, Display = "All-Time VS Records" });
-            reports.Add(new ComboBoxItem { ID = 7, Display = "All-Time VS Stats" });
+            //reports.Add(new ComboBoxItem { ID = 7, Display = "All-Time VS Stats" });
 
             comboBoxReport.DataSource = reports.ToArray();
             comboBoxReport.DisplayMember = "Display";
@@ -257,7 +260,7 @@
                         AllTimeVSRecords();
                         break;
                     case 7:
-                        //AllTimeVSStats();
+                        AllTimeVSStats();
                         break;
                     default:
                         ErrorMessages.ReportCouldNotBeRanMessageBox();
@@ -595,7 +598,7 @@
 
         /// <summary>
         /// The PersonalRecordBook
-        /// TODO: Fix Season Proj stats
+        /// TODO: Fix Relative Points Scored/Against vs Season Proj stats (should be summation of each week in a season and not compared to the draft day projections.
         /// </summary>
         private void PersonalRecordBook()
         {
@@ -749,7 +752,11 @@
                 results.Rows.Add("Relative Points Scored vs Proj (Week)", rel_points_scored_vs_proj_week.best, rel_points_scored_vs_proj_week.worst);
 
                 // Relative Points Scored vs Proj (Season)
-                results.Rows.Add("Relative Points Scored vs Proj (Season)", "-", "-");
+                var best_rel_points_scored_vs_proj_season = teams.Where(t => t.TeamDetail.ProjectedPointsScored != 0 && t.TeamDetail.ProjectedPointsScored != null).OrderByDescending(t => t.TeamDetail.PointsScored / t.TeamDetail.ProjectedPointsScored).FirstOrDefault();
+                var worst_rel_points_scored_vs_proj_season = teams.Where(t => t.TeamDetail.ProjectedPointsScored != 0 && t.TeamDetail.ProjectedPointsScored != null).OrderBy(t => t.TeamDetail.PointsScored / t.TeamDetail.ProjectedPointsScored).FirstOrDefault();
+                (string best, string worst) rel_points_scored_vs_proj_season = (Math.Round(((best_rel_points_scored_vs_proj_season.TeamDetail.PointsScored / (double)best_rel_points_scored_vs_proj_season.TeamDetail.ProjectedPointsScored) - 1) * 100, 3).ToString("F3") + "% (" + best_rel_points_scored_vs_proj_season.LeagueSeason.Season.Name + ")",
+                                                        Math.Round(((worst_rel_points_scored_vs_proj_season.TeamDetail.PointsScored / (double)worst_rel_points_scored_vs_proj_season.TeamDetail.ProjectedPointsScored) - 1) * 100, 3).ToString("F3") + "% (" + worst_rel_points_scored_vs_proj_season.LeagueSeason.Season.Name + ")");
+                results.Rows.Add("Relative Points Scored vs Proj (Season)", rel_points_scored_vs_proj_season.best, rel_points_scored_vs_proj_season.worst);
 
                 // Points Against (Week)
                 var best_points_against_week = all_matchup_details.OrderByDescending(x => x.OppPoints).FirstOrDefault();
@@ -773,7 +780,11 @@
                 results.Rows.Add("Relative Points Against vs Proj (Week)", rel_points_against_vs_proj_week.best, rel_points_against_vs_proj_week.worst);
 
                 // Relative Points Against vs Proj (Season)
-                results.Rows.Add("Relative Points Against vs Proj (Season)", "-", "-");
+                var best_rel_points_against_vs_proj_season = teams.Where(t => t.TeamDetail.PointsAgainst != null && t.TeamDetail.ProjectedPointsAgainst != 0 && t.TeamDetail.ProjectedPointsAgainst != null).OrderByDescending(t => t.TeamDetail.PointsAgainst / t.TeamDetail.ProjectedPointsAgainst).FirstOrDefault();
+                var worst_rel_points_against_vs_proj_season = teams.Where(t => t.TeamDetail.PointsAgainst != null && t.TeamDetail.ProjectedPointsAgainst != 0 && t.TeamDetail.ProjectedPointsAgainst != null).OrderBy(t => t.TeamDetail.PointsAgainst / t.TeamDetail.ProjectedPointsAgainst).FirstOrDefault();
+                (string best, string worst) rel_points_against_vs_proj_season = (Math.Round((((double)best_rel_points_against_vs_proj_season.TeamDetail.PointsAgainst / (double)best_rel_points_against_vs_proj_season.TeamDetail.ProjectedPointsAgainst) - 1) * 100, 3).ToString("F3") + "% (" + best_rel_points_against_vs_proj_season.LeagueSeason.Season.Name + ")",
+                                                        Math.Round((((double)worst_rel_points_against_vs_proj_season.TeamDetail.PointsAgainst / (double)worst_rel_points_against_vs_proj_season.TeamDetail.ProjectedPointsAgainst) - 1) * 100, 3).ToString("F3") + "% (" + worst_rel_points_against_vs_proj_season.LeagueSeason.Season.Name + ")");
+                results.Rows.Add("Relative Points Against vs Proj (Season)", rel_points_against_vs_proj_season.best, rel_points_against_vs_proj_season.worst);
 
                 // Moves
                 Team best_moves = teams.OrderByDescending(t => t.TeamDetail.Moves).First();
@@ -816,7 +827,6 @@
 
         /// <summary>
         /// The AllTimeVSRecords
-        /// TODO: Add Total Row
         /// </summary>
         private void AllTimeVSRecords()
         {
@@ -914,6 +924,14 @@
                         Record vs_spread
                     )> vs_records = new List<(int, string, Record, Record, Record, Record, Record, Record, Record)>();
 
+                Record sum_total = new Record();
+                Record sum_favored = new Record();
+                Record sum_underdog = new Record();
+                Record sum_upsets = new Record();
+                Record sum_blowouts = new Record();
+                Record sum_nailbiters = new Record();
+                Record sum_vs_spread = new Record();
+
                 foreach (int opp_m in all_matchup_details.Select(x => x.OpponentManagerId).Distinct().ToList())
                 {
                     Record total = new Record();
@@ -931,40 +949,135 @@
                         if (md.Points > md.OppPoints)
                         {
                             total.Win();
-                            if (md.ProjPoints > md.OppProjPoints) favored.Win();
-                            if (md.ProjPoints < md.OppProjPoints) underdog.Win();
-                            if (md.ProjPoints <= md.OppProjPoints - 10.0) upsets.Win();
-                            if (Math.Abs(md.Points - md.OppPoints) > 20.0) blowouts.Win();
-                            if (Math.Abs(md.Points - md.OppPoints) < 5.0) nailbiters.Win();
+                            sum_total.Win();
+                            if (md.ProjPoints > md.OppProjPoints)
+                            {
+                                favored.Win();
+                                sum_favored.Win();
+                            }
+                            if (md.ProjPoints < md.OppProjPoints)
+                            {
+                                underdog.Win();
+                                sum_underdog.Win();
+                            }
+                            if (md.ProjPoints <= md.OppProjPoints - 10.0)
+                            {
+                                upsets.Win();
+                                sum_upsets.Win();
+                            }
+                            if (Math.Abs(md.Points - md.OppPoints) > 20.0)
+                            {
+                                blowouts.Win();
+                                sum_blowouts.Win();
+                            }
+                            if (Math.Abs(md.Points - md.OppPoints) < 5.0)
+                            {
+                                nailbiters.Win();
+                                sum_nailbiters.Win();
+                            }
 
-                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints) vs_spread.Win();
-                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints) vs_spread.Loss();
-                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints) vs_spread.Tie();
+                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Win();
+                                sum_vs_spread.Win();
+                            }
+                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Loss();
+                                sum_vs_spread.Loss();
+                            }
+                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Tie();
+                                sum_vs_spread.Tie();
+                            }
                         }
                         else if (md.Points < md.OppPoints)
                         {
                             total.Loss();
-                            if (md.ProjPoints > md.OppProjPoints) favored.Loss();
-                            if (md.ProjPoints < md.OppProjPoints) underdog.Loss();
-                            if (md.ProjPoints - 10.0 >= md.OppProjPoints) upsets.Loss();
-                            if (Math.Abs(md.Points - md.OppPoints) > 20.0) blowouts.Loss();
-                            if (Math.Abs(md.Points - md.OppPoints) < 5.0) nailbiters.Loss();
+                            sum_total.Loss();
+                            if (md.ProjPoints > md.OppProjPoints)
+                            {
+                                favored.Loss();
+                                sum_favored.Loss();
+                            }
+                            if (md.ProjPoints < md.OppProjPoints)
+                            {
+                                underdog.Loss();
+                                sum_underdog.Loss();
+                            }
+                            if (md.ProjPoints - 10.0 >= md.OppProjPoints)
+                            {
+                                upsets.Loss();
+                                sum_upsets.Loss();
+                            }
+                            if (Math.Abs(md.Points - md.OppPoints) > 20.0)
+                            {
+                                blowouts.Loss();
+                                sum_blowouts.Loss();
+                            }
+                            if (Math.Abs(md.Points - md.OppPoints) < 5.0)
+                            {
+                                nailbiters.Loss();
+                                sum_nailbiters.Loss();
+                            }
 
-                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints) vs_spread.Win();
-                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints) vs_spread.Loss();
-                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints) vs_spread.Tie();
+                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Win();
+                                sum_vs_spread.Win();
+                            }
+                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Loss();
+                                sum_vs_spread.Loss();
+                            }
+                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Tie();
+                                sum_vs_spread.Tie();
+                            }
                         }
                         else
                         {
                             total.Tie();
-                            if (md.ProjPoints > md.OppProjPoints) favored.Tie();
-                            if (md.ProjPoints < md.OppProjPoints) underdog.Tie();
-                            if (Math.Abs(md.Points - md.OppPoints) > 20.0) blowouts.Tie();
-                            if (Math.Abs(md.Points - md.OppPoints) < 5.0) nailbiters.Tie();
+                            sum_total.Tie();
+                            if (md.ProjPoints > md.OppProjPoints)
+                            {
+                                favored.Tie();
+                                sum_favored.Tie();
+                            }
+                            if (md.ProjPoints < md.OppProjPoints)
+                            {
+                                underdog.Tie();
+                                sum_underdog.Tie();
+                            }
+                            if (Math.Abs(md.Points - md.OppPoints) > 20.0)
+                            {
+                                blowouts.Tie();
+                                sum_blowouts.Tie();
+                            }
+                            if (Math.Abs(md.Points - md.OppPoints) < 5.0)
+                            {
+                                nailbiters.Tie();
+                                sum_nailbiters.Tie();
+                            }
 
-                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints) vs_spread.Win();
-                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints) vs_spread.Loss();
-                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints) vs_spread.Tie();
+                            if (md.Points - md.OppPoints > md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Win();
+                                sum_vs_spread.Win();
+                            }
+                            else if (md.Points - md.OppPoints < md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Loss();
+                                sum_vs_spread.Loss();
+                            }
+                            else if (md.Points - md.OppPoints == md.ProjPoints - md.OppProjPoints)
+                            {
+                                vs_spread.Tie();
+                                sum_vs_spread.Tie();
+                            }
                         }
                     }
 
@@ -990,13 +1103,27 @@
                                                                         record.blowouts.Display(), record.blowouts.WinPerc(),
                                                                         record.nailbiters.Display(), record.nailbiters.WinPerc(),
                                                                         record.vs_spread.Display(), record.vs_spread.WinPerc());
+                results.Rows.Add("Total",
+                                    sum_total.Display(), sum_total.WinPerc(),
+                                    sum_favored.Display(), sum_favored.WinPerc(),
+                                    sum_underdog.Display(), sum_underdog.WinPerc(),
+                                    sum_upsets.Display(), sum_upsets.WinPerc(),
+                                    sum_blowouts.Display(), sum_blowouts.WinPerc(),
+                                    sum_nailbiters.Display(), sum_nailbiters.WinPerc(),
+                                    sum_vs_spread.Display(), sum_vs_spread.WinPerc());
 
                 dataGridViewManager.DataSource = results;
             }
         }
 
+        /// <summary>
+        /// Defines the <see cref="StatCollection" />
+        /// </summary>
         public class StatCollection
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StatCollection"/> class.
+            /// </summary>
             public StatCollection()
             {
                 this.Display = "";
@@ -1005,6 +1132,13 @@
                 this.Avg = 0.0;
             }
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StatCollection"/> class.
+            /// </summary>
+            /// <param name="display">The display<see cref="string"/></param>
+            /// <param name="max">The max<see cref="double"/></param>
+            /// <param name="min">The min<see cref="double"/></param>
+            /// <param name="avg">The avg<see cref="double"/></param>
             public StatCollection(string display, double max, double min, double avg)
             {
                 Display = display;
@@ -1013,6 +1147,12 @@
                 Avg = avg;
             }
 
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StatCollection"/> class.
+            /// </summary>
+            /// <param name="max">The max<see cref="double"/></param>
+            /// <param name="min">The min<see cref="double"/></param>
+            /// <param name="avg">The avg<see cref="double"/></param>
             public StatCollection(double max, double min, double avg)
             {
                 Display = "";
@@ -1021,10 +1161,32 @@
                 Avg = avg;
             }
 
+            /// <summary>
+            /// Gets or sets the Display
+            /// </summary>
             public required string Display { get; set; }
+
+            /// <summary>
+            /// Gets or sets the Max
+            /// </summary>
             public required double Max { get; set; }
+
+            /// <summary>
+            /// Gets or sets the Min
+            /// </summary>
             public required double Min { get; set; }
+
+            /// <summary>
+            /// Gets or sets the Avg
+            /// </summary>
             public required double Avg { get; set; }
+        }
+
+        /// <summary>
+        /// The AllTimeVSStats
+        /// </summary>
+        private void AllTimeVSStats()
+        {
         }
     }
 }

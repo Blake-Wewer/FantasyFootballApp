@@ -67,6 +67,12 @@ namespace FantasyFootballApp.Models
 
         // Needs Rivalry Week Data and Projected Data
 
+        [Column("projected_points_scored")]
+        public required double ProjectedPointsScored { get; set; }
+
+        [Column("projected_points_against")]
+        public double? ProjectedPointsAgainst { get; set; }
+
         [Column("nut_cup_winner")]
         public int? NutCupWinner { get; set; }
 
