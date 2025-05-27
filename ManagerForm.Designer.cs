@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManagerForm));
             comboBoxManager = new ComboBox();
             label_Manager = new Label();
             listBoxLeagues = new ListBox();
@@ -170,6 +171,7 @@
             Controls.Add(listBoxLeagues);
             Controls.Add(comboBoxManager);
             Controls.Add(label_Manager);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(800, 0);
             Name = "ManagerForm";
             Text = "Manager Breakdown";

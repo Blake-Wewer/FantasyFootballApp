@@ -29,6 +29,7 @@ namespace FantasyFootballApp
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(HomeForm));
             dataGridViewHomeForm = new DataGridView();
             labelLeague = new Label();
             comboBoxLeague = new ComboBox();
@@ -188,6 +189,7 @@ namespace FantasyFootballApp
             Controls.Add(comboBoxLeague);
             Controls.Add(labelLeague);
             Controls.Add(dataGridViewHomeForm);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(800, 0);
             Name = "HomeForm";
             Text = "Fantasy Football App";

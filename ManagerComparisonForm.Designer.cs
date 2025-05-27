@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManagerComparisonForm));
             groupBoxManagerVsManager = new GroupBox();
             numericUpDownYearSpecifier = new NumericUpDown();
             buttonDisplayAllMatchups = new Button();
@@ -1223,6 +1224,7 @@
             Controls.Add(dataGridViewAllManagerVsManagerMatchups);
             Controls.Add(tableLayoutPanelManagerVsManagerComparisonResults);
             Controls.Add(groupBoxManagerVsManager);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(750, 0);
             Name = "ManagerComparisonForm";
             Text = "Manager V Manager Comparison";

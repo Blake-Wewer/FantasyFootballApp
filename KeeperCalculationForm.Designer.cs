@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(KeeperCalculationForm));
             comboBoxLeague = new ComboBox();
             labelLeague = new Label();
             comboBoxManager = new ComboBox();
@@ -414,6 +415,7 @@
             Controls.Add(comboBoxManager);
             Controls.Add(comboBoxLeague);
             Controls.Add(labelLeague);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(550, 500);
             Name = "KeeperCalculationForm";
             Text = "Keeper Calculation";

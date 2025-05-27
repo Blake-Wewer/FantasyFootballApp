@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AllPlayForm));
             textBoxWeekStart = new TextBox();
             labelWeekStart = new Label();
             groupBoxAdditionalAllPlayParameters = new GroupBox();
@@ -252,6 +253,7 @@
             Controls.Add(comboBoxLeague);
             Controls.Add(labelLeague);
             Controls.Add(groupBoxAdditionalAllPlayParameters);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(940, 500);
             Name = "AllPlayForm";
             Text = "All-Play";
