@@ -522,7 +522,7 @@
                 foreach (Team t in teams)
                 {
                     Record team_record = new Record(t.TeamDetail.Wins ?? 0, t.TeamDetail.Losses ?? 0, t.TeamDetail.Ties ?? 0);
-                    int first_draft_pick = context.DraftPicks.Include(dp => dp.Draft).Where(dp => dp.TeamId == t.Id && dp.Round == 1 && dp.Draft.LeagueSeasonId == t.LeagueSeasonId).Select(dp => dp.Pick).First();
+                    int first_draft_pick = context.DraftPicks.Include(dp => dp.Draft).Where(dp => dp.TeamId == t.Id && dp.Draft.LeagueSeasonId == t.LeagueSeasonId).Select(dp => dp.Pick).First();
                     results.Rows.Add(t.LeagueSeason.Season.Name,
                                         team_record.Display(),
                                         t.TeamDetail.DivisionFinish.ToString() ?? "-",
