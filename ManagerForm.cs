@@ -510,7 +510,7 @@
                 results.Columns.Add("Season", typeof(int));
                 results.Columns.Add("Record", typeof(string));
                 results.Columns.Add("Div. Finish", typeof(string));
-                results.Columns.Add("Playoff Seed \n* = Made Playoffs", typeof(string));
+                results.Columns.Add("Playoff Seed\n* = Made Playoffs", typeof(string));
                 results.Columns.Add("Finish", typeof(string));
                 results.Columns.Add("First Pick", typeof(string));
                 results.Columns.Add("First Pick Player", typeof(string));

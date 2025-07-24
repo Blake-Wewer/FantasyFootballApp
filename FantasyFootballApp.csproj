@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,7 +11,6 @@
     <BaseOutputPath>C:\Users\bewew\Desktop\FantasyFootballApp Builds</BaseOutputPath>
     <PackageOutputPath>C:\Users\bewew\Desktop\FantasyFootballApp Builds</PackageOutputPath>
     <PackageIcon></PackageIcon>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <ApplicationIcon>Fantasy Football App Icon.ico</ApplicationIcon>
   </PropertyGroup>
 
