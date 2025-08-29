@@ -37,10 +37,10 @@ namespace FantasyFootballApp.Models
         public int? NutCupWeek { get; set; }
 
         [Column("avg_points")]
-        public required double AvgPoints { get; set; }
+        public double? AvgPoints { get; set; }
 
         [Column("avg_moves")]
-        public required double AvgMoves { get; set; }
+        public double? AvgMoves { get; set; }
 
         [Column("completed")]
         public required int Completed { get; set; }

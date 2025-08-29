@@ -37,7 +37,7 @@ namespace FantasyFootballApp.Models
         public required string StatusDetails { get; set; }
 
         [Column("image")]
-        public required string Image { get; set; }
+        public string? Image { get; set; }
 
         [Column("create_date")]
         public required DateTime CreateDate { get; set; }
