@@ -132,6 +132,8 @@ namespace FantasyFootballApp
                 return;
             }
 
+            UpdateManagerNameFields();
+
             using (AppDbContext context = new AppDbContext())
             {
                 // Set Dynamic Labels
@@ -564,6 +566,74 @@ namespace FantasyFootballApp
                 dataGridViewAllManagerVsManagerMatchups.Enabled = false;
                 dataGridViewAllManagerVsManagerMatchups.Visible = false;
             }
+        }
+
+        private void UpdateManagerNameFields()
+        {
+            if (selectedFavoredManager == -1 || selectedOpponentManager == -1 || selectedLeague == -1)
+                return;
+
+            using (AppDbContext context = new AppDbContext())
+            {
+                var currentLeagueSeason = context.LeagueSeasons
+                    .Where(ls => ls.LeagueId == selectedLeague && ls.Completed == 0)
+                    .FirstOrDefault();
+
+                if (currentLeagueSeason != null)
+                {
+                    var hasMatchups = context.Matchups
+                        .Any(m => m.LeagueSeasonId == currentLeagueSeason.Id);
+
+                    if (hasMatchups)
+                    {
+                        var favoredTeam = context.Teams
+                            .Where(t => t.ManagerId == selectedFavoredManager && t.LeagueSeasonId == currentLeagueSeason.Id)
+                            .Include(t => t.Manager)
+                            .FirstOrDefault();
+
+                        var opponentTeam = context.Teams
+                            .Where(t => t.ManagerId == selectedOpponentManager && t.LeagueSeasonId == currentLeagueSeason.Id)
+                            .Include(t => t.Manager)
+                            .FirstOrDefault();
+
+                        if (favoredTeam != null && opponentTeam != null)
+                        {
+                            textBoxFavoredManager.Text = GetManagerRecordDisplay(favoredTeam.Manager, currentLeagueSeason.Id, context);
+                            textBoxOpponentManager.Text = GetManagerRecordDisplay(opponentTeam.Manager, currentLeagueSeason.Id, context);
+                            return;
+                        }
+                    }
+                }
+
+                var favoredManager = context.Managers.Find(selectedFavoredManager);
+                var opponentManager = context.Managers.Find(selectedOpponentManager);
+                textBoxFavoredManager.Text = favoredManager.FirstName + " " + favoredManager.LastName;
+                textBoxOpponentManager.Text = opponentManager.FirstName + " " + opponentManager.LastName;
+            }
+        }
+
+        private string GetManagerRecordDisplay(Manager manager, int leagueSeasonId, AppDbContext context)
+        {
+            var matchupDetails = context.MatchupDetails
+                .Where(md => md.Team.ManagerId == manager.Id && md.Matchup.LeagueSeasonId == leagueSeasonId)
+                .Include(md => md.Matchup)
+                    .ThenInclude(m => m.MatchupDetails)
+                .ToList();
+
+            int wins = 0, losses = 0, ties = 0;
+            foreach (var md in matchupDetails)
+            {
+                var opponent = md.Matchup.MatchupDetails.FirstOrDefault(omd => omd.Id != md.Id);
+                if (opponent != null)
+                {
+                    if (md.TeamPoints > opponent.TeamPoints) wins++;
+                    else if (md.TeamPoints < opponent.TeamPoints) losses++;
+                    else ties++;
+                }
+            }
+
+            string displayName = manager.Nickname ?? manager.FirstName;
+            return ties == 0 ? $"{displayName} ({wins}-{losses})" : $"{displayName} ({wins}-{losses}-{ties})";
         }
 
         private void comboBoxFavoredManager_SelectedIndexChanged(object sender, EventArgs e)

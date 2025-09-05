@@ -491,6 +491,7 @@
             textBoxFavoredManager.Location = new Point(1, 1);
             textBoxFavoredManager.Margin = new Padding(0);
             textBoxFavoredManager.Name = "textBoxFavoredManager";
+            textBoxFavoredManager.ReadOnly = true;
             textBoxFavoredManager.Size = new Size(479, 34);
             textBoxFavoredManager.TabIndex = 0;
             textBoxFavoredManager.TextAlign = HorizontalAlignment.Center;
@@ -502,6 +503,7 @@
             textBoxOpponentManager.Location = new Point(481, 1);
             textBoxOpponentManager.Margin = new Padding(0);
             textBoxOpponentManager.Name = "textBoxOpponentManager";
+            textBoxOpponentManager.ReadOnly = true;
             textBoxOpponentManager.Size = new Size(479, 34);
             textBoxOpponentManager.TabIndex = 1;
             textBoxOpponentManager.TextAlign = HorizontalAlignment.Center;
