@@ -486,24 +486,24 @@
             // 
             // textBoxFavoredManager
             // 
+            textBoxFavoredManager.BackColor = SystemColors.Window;
             tableLayoutPanelManagerVsManagerComparisonResults.SetColumnSpan(textBoxFavoredManager, 6);
             textBoxFavoredManager.Font = new Font("Segoe UI", 15F, FontStyle.Bold, GraphicsUnit.Point, 0);
             textBoxFavoredManager.Location = new Point(1, 1);
             textBoxFavoredManager.Margin = new Padding(0);
             textBoxFavoredManager.Name = "textBoxFavoredManager";
-            textBoxFavoredManager.ReadOnly = true;
             textBoxFavoredManager.Size = new Size(479, 34);
             textBoxFavoredManager.TabIndex = 0;
             textBoxFavoredManager.TextAlign = HorizontalAlignment.Center;
             // 
             // textBoxOpponentManager
             // 
+            textBoxOpponentManager.BackColor = SystemColors.Window;
             tableLayoutPanelManagerVsManagerComparisonResults.SetColumnSpan(textBoxOpponentManager, 6);
             textBoxOpponentManager.Font = new Font("Segoe UI", 15F, FontStyle.Bold, GraphicsUnit.Point, 0);
             textBoxOpponentManager.Location = new Point(481, 1);
             textBoxOpponentManager.Margin = new Padding(0);
             textBoxOpponentManager.Name = "textBoxOpponentManager";
-            textBoxOpponentManager.ReadOnly = true;
             textBoxOpponentManager.Size = new Size(479, 34);
             textBoxOpponentManager.TabIndex = 1;
             textBoxOpponentManager.TextAlign = HorizontalAlignment.Center;
@@ -1223,9 +1223,9 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(982, 737);
-            Controls.Add(dataGridViewAllManagerVsManagerMatchups);
             Controls.Add(tableLayoutPanelManagerVsManagerComparisonResults);
             Controls.Add(groupBoxManagerVsManager);
+            Controls.Add(dataGridViewAllManagerVsManagerMatchups);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(750, 0);
             Name = "ManagerComparisonForm";

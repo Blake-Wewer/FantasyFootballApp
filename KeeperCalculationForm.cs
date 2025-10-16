@@ -117,7 +117,12 @@
                 {
                     manager_query = manager_query.Where(m => false);
                 }
-                List<Manager> managers = manager_query.ToList();
+                List<Manager> managers = manager_query
+                                .OrderByDescending(m => m.SpreadsheetEligible)
+                                .ThenByDescending(m => m.AggregationRankingEligible)
+                                .ThenBy(m => m.FirstName)
+                                .ThenBy(m => m.LastName)
+                                .ToList();
                 List<ComboBoxItem> formattedManagers = new List<ComboBoxItem>();
                 formattedManagers.Add(new ComboBoxItem { ID = -1, Display = " - Select a Manager - " });
                 foreach (Manager manager in managers)

@@ -108,6 +108,10 @@
                                 .Include(m => m.Teams)
                                     .ThenInclude(t => t.LeagueSeason)
                                 .Where(m => m.Teams.Any(t => permittedLeagues.Contains(t.LeagueSeason.LeagueId)))
+                                .OrderByDescending(m => m.SpreadsheetEligible)
+                                .ThenByDescending(m => m.AggregationRankingEligible)
+                                .ThenBy(m => m.FirstName)
+                                .ThenBy(m => m.LastName)
                                 .ToList();
                 List<ComboBoxItem> formattedManagers = new List<ComboBoxItem>();
                 formattedManagers.Add(new ComboBoxItem { ID = -1, Display = " - Select a Manager - " });

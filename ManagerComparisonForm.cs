@@ -53,6 +53,10 @@ namespace FantasyFootballApp
                                 .Include(m => m.Teams)
                                     .ThenInclude(t => t.LeagueSeason)
                                 .Where(m => m.Teams.Any(t => t.LeagueSeason.LeagueId == selectedLeague))
+                                .OrderByDescending(m => m.SpreadsheetEligible)
+                                .ThenByDescending(m => m.AggregationRankingEligible)
+                                .ThenBy(m => m.FirstName)
+                                .ThenBy(m => m.LastName)
                                 .ToList();
                 List<ComboBoxItem> formattedManagers = new List<ComboBoxItem>();
                 formattedManagers.Add(new ComboBoxItem { ID = -1, Display = " - Select a Manager - " });
@@ -133,6 +137,8 @@ namespace FantasyFootballApp
             }
 
             UpdateManagerNameFields();
+            textBoxFavoredManagerProjectedScore.Clear();
+            textBoxOpponentManagerProjectedScore.Clear();
 
             using (AppDbContext context = new AppDbContext())
             {
@@ -257,10 +263,10 @@ namespace FantasyFootballApp
                     }
                 }
                 String favored_manager_avg_division_finish = favored_manager.Teams.Any(t => t.TeamDetail.DivisionFinish != null && t.LeagueSeason.LeagueId == selectedLeague)
-                                                            ? favored_manager.Teams.Where(t => t.TeamDetail.DivisionFinish != null && t.LeagueSeason.LeagueId == selectedLeague).Average(t => t.TeamDetail.DivisionFinish.Value).ToString()
+                                                            ? favored_manager.Teams.Where(t => t.TeamDetail.DivisionFinish != null && t.LeagueSeason.LeagueId == selectedLeague && t.LeagueSeason.Completed == 1).Average(t => t.TeamDetail.DivisionFinish.Value).ToString()
                                                             : "-";
-                String favored_manager_avg_playoff_seed = favored_manager.Teams.Where(t => t.TeamDetail.PlayoffSeed != null && t.LeagueSeason.LeagueId == selectedLeague).Select(t => (double)t.TeamDetail.PlayoffSeed * (normalized_league_data?.NormalizedLeagueSize / (double)t.LeagueSeason.NumTeams)).DefaultIfEmpty(-1).Average().ToString() ?? "-";
-                String favored_manager_avg_finish = favored_manager.Teams.Where(t => t.LeagueSeason.LeagueId == selectedLeague).Select(t => (double)t.TeamDetail.Finish * (normalized_league_data?.NormalizedLeagueSize / (double)t.LeagueSeason.NumTeams)).DefaultIfEmpty(-1).Average().ToString() ?? "-";
+                String favored_manager_avg_playoff_seed = favored_manager.Teams.Where(t => t.TeamDetail.PlayoffSeed != null && t.LeagueSeason.LeagueId == selectedLeague && t.LeagueSeason.Completed == 1).Select(t => (double)t.TeamDetail.PlayoffSeed * (normalized_league_data?.NormalizedLeagueSize / (double)t.LeagueSeason.NumTeams)).DefaultIfEmpty(-1).Average().ToString() ?? "-";
+                String favored_manager_avg_finish = favored_manager.Teams.Where(t => t.LeagueSeason.LeagueId == selectedLeague && t.LeagueSeason.Completed == 1).Select(t => (double)t.TeamDetail.Finish * (normalized_league_data?.NormalizedLeagueSize / (double)t.LeagueSeason.NumTeams)).DefaultIfEmpty(-1).Average().ToString() ?? "-";
                 int favored_manager_championships = favored_manager.Teams.Where(t => t.LeagueSeason.LeagueId == selectedLeague && t.TeamDetail.Finish == 1).Count();
 
 
@@ -301,10 +307,10 @@ namespace FantasyFootballApp
                     }
                 }
                 String opponent_manager_avg_division_finish = opponent_manager.Teams.Any(t => t.TeamDetail.DivisionFinish != null && t.LeagueSeason.LeagueId == selectedLeague)
-                                                            ? opponent_manager.Teams.Where(t => t.TeamDetail.DivisionFinish != null && t.LeagueSeason.LeagueId == selectedLeague).Average(t => t.TeamDetail.DivisionFinish.Value).ToString()
+                                                            ? opponent_manager.Teams.Where(t => t.TeamDetail.DivisionFinish != null && t.LeagueSeason.LeagueId == selectedLeague && t.LeagueSeason.Completed == 1).Average(t => t.TeamDetail.DivisionFinish.Value).ToString()
                                                             : "-";
-                String opponent_manager_avg_playoff_seed = opponent_manager.Teams.Where(t => t.TeamDetail.PlayoffSeed != null && t.LeagueSeason.LeagueId == selectedLeague).Select(t => (double)t.TeamDetail.PlayoffSeed * (normalized_league_data?.NormalizedLeagueSize / (double)t.LeagueSeason.NumTeams)).DefaultIfEmpty(-1).Average().ToString() ?? "-";
-                String opponent_manager_avg_finish = opponent_manager.Teams.Where(t => t.LeagueSeason.LeagueId == selectedLeague).Select(t => (double)t.TeamDetail.Finish * (normalized_league_data?.NormalizedLeagueSize / (double)t.LeagueSeason.NumTeams)).DefaultIfEmpty(-1).Average().ToString() ?? "-";
+                String opponent_manager_avg_playoff_seed = opponent_manager.Teams.Where(t => t.TeamDetail.PlayoffSeed != null && t.LeagueSeason.LeagueId == selectedLeague && t.LeagueSeason.Completed == 1).Select(t => (double)t.TeamDetail.PlayoffSeed * (normalized_league_data?.NormalizedLeagueSize / (double)t.LeagueSeason.NumTeams)).DefaultIfEmpty(-1).Average().ToString() ?? "-";
+                String opponent_manager_avg_finish = opponent_manager.Teams.Where(t => t.LeagueSeason.LeagueId == selectedLeague && t.LeagueSeason.Completed == 1).Select(t => (double)t.TeamDetail.Finish * (normalized_league_data?.NormalizedLeagueSize / (double)t.LeagueSeason.NumTeams)).DefaultIfEmpty(-1).Average().ToString() ?? "-";
                 int opponent_manager_championships = opponent_manager.Teams.Where(t => t.LeagueSeason.LeagueId == selectedLeague && t.TeamDetail.Finish == 1).Count();
 
 
